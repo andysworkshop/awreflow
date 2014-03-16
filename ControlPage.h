@@ -19,20 +19,30 @@ namespace awreflow {
 
     protected:
       enum {
-        LEADED    = 0,
-        LEAD_FREE = 1,
-        REFLOW    = 2,
-        P         = 4,
-        I         = 5,
-        D         = 6
+        LEADED       = 0,
+        LEAD_FREE    = 1,
+        REFLOW       = 2,
+        PROPORTIONAL = 4,
+        INTEGER      = 5,
+        DERIVATIVE   = 6
       } _selectedButton;
 
       bool _leadedChecked;
+      bool _captive;
+
+      volatile bool _buttonPressed;
+      volatile ButtonIdentifier _buttonId;
 
     protected:
       void redrawAll();
-      void drawSelection(Flash& flash,bool draw);
-      void drawSelection(Panel::LcdPanel& gl,Flash& flash,uint8_t selbtn,uint32_t offset,uint32_t length,Panel::tCOLOUR colour,uint8_t deselbtn);
+      void drawSelectionAndCheck(Flash& flash,bool draw);
+      void drawSelection(bool draw);
+      void drawCheck(Flash& flash);
+      void drawCheck(Flash& flash,uint8_t selbtn,uint32_t offset,uint32_t length,Panel::tCOLOUR colour,uint8_t deselbtn);
+      void onButtonPressed(ButtonIdentifier id);
+      void handleOk();
+      void handleRight();
+      void handleLeft();
 
     public:
       ControlPage(Panel& panel,Buttons& buttons);
@@ -48,6 +58,8 @@ namespace awreflow {
   inline ControlPage::ControlPage(Panel& panel,Buttons& buttons)
     : PageBase(panel,buttons),
       _selectedButton(REFLOW),
-      _leadedChecked(true) {
+      _leadedChecked(true),
+      _captive(false),
+      _buttonPressed(false) {
   }
 }

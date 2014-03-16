@@ -39,7 +39,7 @@ namespace awreflow {
 
     _buttons[static_cast<uint8_t>(ButtonIdentifier::OK)]=pc[14];
 
-    // Set ourselves up as a subscriber to interrupts raised by the timer class
+    // set ourselves up as a subscriber to interrupts raised by the timer class
 
     _buttonTimer.TimerInterruptEventSender.insertSubscriber(
         TimerInterruptEventSourceSlot::bind(this,&Buttons::onInterrupt)
@@ -57,14 +57,13 @@ namespace awreflow {
 
     _buttonTimer.setTimeBaseByFrequency(5000,49,TIM_CounterMode_CenterAligned3);
 
-    // Enable just the Update interrupt.
+    // enable just the Update interrupt.
 
     _buttonTimer.enableInterrupts(TIM_IT_Update);
 
     // start the timer
 
     _buttonTimer.enablePeripheral();
-
   }
 
 

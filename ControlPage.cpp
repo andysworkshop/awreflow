@@ -51,11 +51,172 @@ namespace awreflow {
 
   void ControlPage::run() {
 
+    // subscribe to button events
+
+    _buttons.ButtonPressedEventSender.insertSubscriber(ButtonPressedEventSourceSlot::bind(this,&ControlPage::onButtonPressed));
+
     // draw the full GUI
 
+    redrawAll();
+
+    // go into a keypress event loop
+
     for(;;) {
-      redrawAll();
-      MillisecondTimer::delay(5000);
+
+      while(!_buttonPressed);
+
+      switch(_buttonId) {
+
+        case ButtonIdentifier::LEFT:
+          handleLeft();
+          break;
+
+        case ButtonIdentifier::RIGHT:
+          handleRight();
+          break;
+
+        case ButtonIdentifier::OK:
+          handleOk();
+          break;
+      }
+
+      // ready for the next press
+
+      _buttonPressed=false;
+    }
+
+    // unsubscribe from button events
+
+    _buttons.ButtonPressedEventSender.removeSubscriber(ButtonPressedEventSourceSlot::bind(this,&ControlPage::onButtonPressed));
+  }
+
+
+  /*
+   * Left button pressed: navigate backwards
+   */
+
+  void ControlPage::handleLeft() {
+
+    // erase old selection
+
+    drawSelection(false);
+
+    // set the new selection
+
+    switch(_selectedButton) {
+
+      case LEADED:
+        _selectedButton=DERIVATIVE;
+        break;
+
+      case LEAD_FREE:
+        _selectedButton=REFLOW;
+        break;
+
+      case REFLOW:
+        _selectedButton=LEADED;
+        break;
+
+      case PROPORTIONAL:
+        _selectedButton=LEAD_FREE;
+        break;
+
+      case INTEGER:
+        _selectedButton=PROPORTIONAL;
+        break;
+
+      case DERIVATIVE:
+        _selectedButton=INTEGER;
+        break;
+    }
+
+    // draw the new selection
+
+    drawSelection(true);
+  }
+
+
+  /*
+   * Right button pressed: navigate forwards through the items
+   */
+
+  void ControlPage::handleRight() {
+
+    // erase old selection
+
+    drawSelection(false);
+
+    // set the new selection
+
+    switch(_selectedButton) {
+
+      case LEADED:
+        _selectedButton=REFLOW;
+        break;
+
+      case LEAD_FREE:
+        _selectedButton=PROPORTIONAL;
+        break;
+
+      case REFLOW:
+        _selectedButton=LEAD_FREE;
+        break;
+
+      case PROPORTIONAL:
+        _selectedButton=INTEGER;
+        break;
+
+      case INTEGER:
+        _selectedButton=DERIVATIVE;
+        break;
+
+      case DERIVATIVE:
+        _selectedButton=LEADED;
+        break;
+    }
+
+    // draw the new selection
+
+    drawSelection(true);
+  }
+
+
+  /*
+   * Handle the OK button
+   */
+
+  void ControlPage::handleOk() {
+
+    if(_captive) {
+      _captive=false;
+      drawSelection(true);
+    }
+    else {
+
+      switch(_selectedButton) {
+
+        case PROPORTIONAL:
+        case INTEGER:
+        case DERIVATIVE:
+          _captive=true;      // move into the captive state where left/right are directed to these buttons
+          drawSelection(true);
+          break;
+
+        case LEADED:
+        case LEAD_FREE:
+          {
+            // change the selected profile to leaded/unleaded
+
+            Flash flash(_panel);
+
+            _leadedChecked=_selectedButton==LEADED;
+            drawCheck(flash);
+          }
+          break;
+
+        default:
+          break;
+      }
     }
   }
 
@@ -79,7 +240,7 @@ namespace awreflow {
     flash.drawBitmap(Rectangle(20,20,91,24),FlashInfo::CONTROL::OFFSET,FlashInfo::CONTROL::LENGTH);
 
     drawButtons(flash,GuiButtons,sizeof(GuiButtons)/sizeof(GuiButtons[0]));
-    drawSelection(flash,true);
+    drawSelectionAndCheck(flash,true);
 
     // lights back on
 
@@ -91,25 +252,43 @@ namespace awreflow {
    * Draw the selection and check boxes
    */
 
-  void ControlPage::drawSelection(Flash& flash,bool draw) {
+  void ControlPage::drawSelectionAndCheck(Flash& flash,bool draw) {
 
-    const UiButton& button=GuiButtons[static_cast<uint8_t>(_selectedButton)];
-    Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
+    drawSelection(draw);
+    drawCheck(flash);
+
+  }
+
+
+  /*
+   * Draw the selection box
+   */
+
+  void ControlPage::drawSelection(bool draw) {
 
     // selection box
 
-    gl.setForeground(draw ? ColourNames::ORANGE : ColourNames::BLACK);
-    gl.drawRectangle(
+    const UiButton& button=GuiButtons[static_cast<uint8_t>(_selectedButton)];
+
+    _gl.setForeground(draw ? (_captive ? ColourNames::GREEN : ColourNames::ORANGE) : ColourNames::BLACK);
+    _gl.drawRectangle(
         Rectangle(button.X-5,button.Y-5,button.Width+10,button.Height+10)
       );
+  }
+
+
+  /*
+   * Draw the check box
+   */
+
+  void ControlPage::drawCheck(Flash& flash) {
 
     // check box
 
     if(_leadedChecked)
-      drawSelection(gl,flash,LEADED,FlashInfo::LEADCHECKED::OFFSET,FlashInfo::LEADCHECKED::LENGTH,0x00cd99,LEAD_FREE);
+      drawCheck(flash,LEADED,FlashInfo::LEADCHECKED::OFFSET,FlashInfo::LEADCHECKED::LENGTH,0x00cd99,LEAD_FREE);
     else
-      drawSelection(gl,flash,LEAD_FREE,FlashInfo::LEADFREECHECKED::OFFSET,FlashInfo::LEADFREECHECKED::LENGTH,0x00c3d2,LEADED);
-
+      drawCheck(flash,LEAD_FREE,FlashInfo::LEADFREECHECKED::OFFSET,FlashInfo::LEADFREECHECKED::LENGTH,0x00c3d2,LEADED);
   }
 
 
@@ -117,8 +296,7 @@ namespace awreflow {
    * Draw the checkbox and erase the area of the other check box
    */
 
-  void ControlPage::drawSelection(
-      Panel::LcdPanel& gl,
+  void ControlPage::drawCheck(
       Flash& flash,
       uint8_t selbtn,
       uint32_t offset,
@@ -138,11 +316,27 @@ namespace awreflow {
 
     // erase other checkbox space
 
-    gl.setForeground(colour);
-    gl.fillRectangle(
+    _gl.setForeground(colour);
+    _gl.fillRectangle(
         Rectangle(GuiButtons[deselbtn].X+GuiButtons[deselbtn].Width-26-7,
                   GuiButtons[deselbtn].Y+7,
                   26,
                   26));
+  }
+
+
+  /*
+   * Subscription callback for button events. This is IRQ code so don't
+   * get carried away with your code here.
+   */
+
+  void ControlPage::onButtonPressed(ButtonIdentifier id) {
+
+    // if the main thread is ready for another event then signal it
+
+    if(!_buttonPressed) {
+      _buttonPressed=true;
+      _buttonId=id;
+    }
   }
 }

@@ -32,7 +32,9 @@ using namespace stm32plus::display;
 #include "UiButton.h"
 #include "Flash.h"
 #include "PageBase.h"
+#include "TemperatureReader.h"
+#include "Max6675TemperatureReader.h"
 #include "ControlPage.h"
 #include "Reflow.h"
 #include "SplashScreen.h"
-
+#include "TemperatureReader.h"

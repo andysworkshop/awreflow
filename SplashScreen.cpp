@@ -26,9 +26,9 @@ namespace awreflow {
     // draw the splash
 
     flash.drawBitmap(
-        Rectangle(0,0,FlashInfo::Logo::WIDTH,FlashInfo::Logo::HEIGHT),
-        FlashInfo::Logo::OFFSET,
-        FlashInfo::Logo::LENGTH);
+        Rectangle(0,0,FlashInfo::LOGO640X400::WIDTH,FlashInfo::LOGO640X400::HEIGHT),
+        FlashInfo::LOGO640X400::OFFSET,
+        FlashInfo::LOGO640X400::LENGTH);
 
     // lights on and hold
 

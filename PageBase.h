@@ -18,6 +18,7 @@ namespace awreflow {
       };
 
       Panel& _panel;
+      Panel::LcdPanel& _gl;
       Buttons& _buttons;
 
     protected:
@@ -36,6 +37,7 @@ namespace awreflow {
 
   inline PageBase::PageBase(Panel& panel,Buttons& buttons)
     : _panel(panel),
+      _gl(panel.getGraphicsLibrary()),
       _buttons(buttons) {
   }
 }
