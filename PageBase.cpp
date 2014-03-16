@@ -1,0 +1,82 @@
+/*
+ * Andy's Workshop Reflow Oven Controller.
+ * Copyright (c) 2014 Andy Brown. All rights reserved.
+ * Please see website (http://www.andybrown.me.uk) for full details.
+ */
+
+#include "Application.h"
+
+
+namespace awreflow {
+
+
+  /*
+   * Redraw the buttons
+   */
+
+  void PageBase::drawButtons(Flash& flash,const UiButton *buttons,uint8_t numButtons) {
+
+    const UiButton *button;
+
+    for(button=buttons;numButtons;numButtons--,button++)
+      drawButton(flash,button);
+  }
+
+
+  /*
+   * Draw a single button
+   */
+
+  void PageBase::drawButton(Flash& flash,const UiButton *button) {
+
+    uint16_t x,y;
+    Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
+
+    // draw the accent line
+
+    gl.setForeground(button->AccentColour);
+    gl.drawLine(Point(button->X,button->Y),Point(button->X+button->Width-1,button->Y));
+
+    // fill the button rectangle
+
+    Rectangle rc(button->X,button->Y+1,button->Width,button->Height-1);
+
+    gl.setForeground(button->BackgroundColour);
+    gl.fillRectangle(rc);
+
+    // draw the graphic, centered
+
+    x=button->X+(button->Width/2)-(button->IconWidth)/2;
+    y=button->Y+(button->Height/2)-(button->IconHeight)/2;
+
+    flash.drawBitmap(
+        Rectangle(x,y,button->IconWidth,button->IconHeight),
+        static_cast<uint32_t>(button->IconFlashAddress),
+        button->IconSize
+      );
+
+    // draw the prompt, bottom right
+
+    x=button->X+button->Width-button->PromptWidth-7;
+    y=button->Y+button->Height-button->PromptHeight-7;
+
+    flash.drawBitmap(
+        Rectangle(x,y,button->PromptWidth,button->PromptHeight),
+        static_cast<uint32_t>(button->PromptFlashAddress),
+        button->PromptSize
+      );
+  }
+
+
+  /*
+   * Redraw the buttons
+   */
+
+  void PageBase::clearBackground() {
+
+    Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
+
+    gl.setBackground(ColourNames::BLACK);
+    gl.clearScreen();
+  }
+}
