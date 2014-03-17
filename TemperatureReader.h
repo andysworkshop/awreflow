@@ -16,9 +16,31 @@ namespace awreflow {
    */
 
   template<class TImpl>
-  struct TemperatureReader {
-    uint16_t readTemperature() {
-      return static_cast<TImpl *>(this)->readTemperature();
-    }
+  class TemperatureReader {
+
+    public:
+
+      struct Result {
+        uint16_t Temperature;
+
+        enum {
+          NO_ERROR,
+          E_OPEN_THERMOCOUPLE,
+          E_COMMS_FAILURE
+        } Status;
+      };
+
+    public:
+      Result readTemperature();
   };
+
+
+  /**
+   * Read back the temperature from the sensor
+   */
+
+  template<class TImpl>
+  inline typename TemperatureReader<TImpl>::Result TemperatureReader<TImpl>::readTemperature() {
+    return static_cast<TImpl *>(this)->readTemperature();
+  }
 }

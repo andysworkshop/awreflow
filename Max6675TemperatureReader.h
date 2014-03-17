@@ -16,7 +16,20 @@ namespace awreflow {
    */
 
   struct Max6675TemperatureReader : TemperatureReader<Max6675TemperatureReader> {
-    uint16_t readTemperature();
+
+    enum {
+      Port_NSS = GPIOA_BASE,
+      Port_SCK = GPIOA_BASE,
+      Port_MISO = GPIOA_BASE,
+      Port_MOSI = GPIOA_BASE,
+
+      Pin_NSS  = GPIO_Pin_4,
+      Pin_SCK  = GPIO_Pin_5,
+      Pin_MISO = GPIO_Pin_6,
+      Pin_MOSI = GPIO_Pin_7
+    };
+
+    Result readTemperature();
   };
 
 
