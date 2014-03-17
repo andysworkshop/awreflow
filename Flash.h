@@ -65,5 +65,16 @@ namespace awreflow {
       ~Flash();
 
       void drawBitmap(const Rectangle& rc,uint32_t offset,uint32_t length);
+
+      Panel::LcdPanel& getGraphicsLibrary();
   };
+
+
+  /*
+   * Convenience method to get the graphics library object
+   */
+
+  inline Panel::LcdPanel& Flash::getGraphicsLibrary() {
+    return _panel.getGraphicsLibrary();
+  }
 }

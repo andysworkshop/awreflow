@@ -19,8 +19,8 @@ namespace awreflow {
   class IntegerNumberWriter : public NumberWriter {
 
     public:
-      IntegerNumberWriter(Flash& flash,Panel::tCOLOUR bgColour,Digit *digits,uint8_t height);
+      IntegerNumberWriter(Panel::tCOLOUR bgColour,Digit *digits,uint8_t height);
 
-      uint16_t write(const Point& p,uint32_t number) const;
+      uint16_t write(Flash& flash,const Point& p,uint32_t number) const;
   };
 }

@@ -36,6 +36,7 @@ using namespace stm32plus::display;
 #include "Max6675TemperatureReader.h"
 #include "NumberWriter.h"
 #include "IntegerNumberWriter.h"
+#include "TemperatureControlWriter.h"
 #include "ControlPage.h"
 #include "Reflow.h"
 #include "SplashScreen.h"

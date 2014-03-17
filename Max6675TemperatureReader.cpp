@@ -14,7 +14,8 @@ namespace awreflow {
   /*
    * Read the temperature. The MAX6675 outputs a 12-bit temperature reading encoded into a
    * 16-bit word along with some additional status bits. It can operate at up to 5MHz. It
-   * converts while CS is high and needs a conversion time of 220ms.
+   * converts while CS is high and needs a conversion time of 220ms. We must ensure that we
+   * call this method at a low frequency, for example once per second.
    */
 
   TemperatureReader<Max6675TemperatureReader>::Result Max6675TemperatureReader::readTemperature() {
@@ -54,10 +55,6 @@ namespace awreflow {
     // deselect the peripheral
 
     spi.setNss(true);
-
-    // a conversion cannot be made for another 220ms so we need to guarantee that here
-
-    MillisecondTimer::delay(250);
 
     // check for errors
 

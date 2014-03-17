@@ -14,9 +14,8 @@ namespace awreflow {
    * Constructor
    */
 
-  NumberWriter::NumberWriter(Flash& flash,Panel::tCOLOUR bgColour,const Digit *digits,uint8_t height)
-    : _flash(flash),
-      _backgroundColour(bgColour),
+  NumberWriter::NumberWriter(Panel::tCOLOUR bgColour,const Digit *digits,uint8_t height)
+    : _backgroundColour(bgColour),
       _height(height),
       _digits(digits),
       _lastWidth(0) {
@@ -24,15 +23,15 @@ namespace awreflow {
 
 
   /*
-   * Write out the number and return the width in pixels
+   * Write out the number and return the width in pixels. The previous number, if any, is completely erased
    */
 
-  uint16_t NumberWriter::write(const Point& p,const char *buffer) const {
+  uint16_t NumberWriter::write(Flash& flash,const Point& p,const char *buffer) const {
 
     const char *ptr;
     const Digit *digit;
     Rectangle rc;
-    int origin;
+    int origin,width;
 
     // set up the numbers
 
@@ -55,15 +54,30 @@ namespace awreflow {
 
       // draw it
 
-      _flash.drawBitmap(rc,digit->FlashAddress,digit->Length);
+      flash.drawBitmap(rc,digit->FlashAddress,digit->Length);
 
       // update
 
       rc.X+=rc.Width;
     }
 
+    // get the width
+
+    width=rc.X-origin;
+
+    // if the new width is less than the previous width then we need to wipe out the overflow
+
+    if(_lastWidth && width<_lastWidth) {
+
+      Panel::LcdPanel& gl(flash.getGraphicsLibrary());
+
+      rc.Width=_lastWidth-width;
+      gl.setBackground(_backgroundColour);
+      gl.clearRectangle(rc);
+    }
+
     // return the width
 
-    return rc.X-origin;
+    return width;
   }
 }

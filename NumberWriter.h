@@ -26,16 +26,15 @@ namespace awreflow {
       };
 
     protected:
-      Flash& _flash;                      // reference to the SPI flash device
       Panel::tCOLOUR _backgroundColour;   // background colour
       uint8_t _height;                    // pixel height of the digits
       const Digit *_digits;               // 0..9 and '.' (dec point). 11 "digits" in total.
       uint16_t _lastWidth;                // last output width for this number
 
     protected:
-      uint16_t write(const Point& p,const char *buffer) const;
+      uint16_t write(Flash& flash,const Point& p,const char *buffer) const;
 
     public:
-      NumberWriter(Flash& flash,Panel::tCOLOUR bgColour,const Digit *digits,uint8_t height);
+      NumberWriter(Panel::tCOLOUR bgColour,const Digit *digits,uint8_t height);
   };
 }

@@ -51,6 +51,8 @@ namespace awreflow {
 
   void ControlPage::run() {
 
+    uint32_t start;
+
     // subscribe to button events
 
     _buttons.ButtonPressedEventSender.insertSubscriber(ButtonPressedEventSourceSlot::bind(this,&ControlPage::onButtonPressed));
@@ -59,30 +61,40 @@ namespace awreflow {
 
     redrawAll();
 
-    // go into a keypress event loop
+    // go into a keypress/timeout event loop
 
-    for(;;) {
+    for(start=MillisecondTimer::millis();;) {
 
-      while(!_buttonPressed);
+      // each second, sample the temperature and display it
 
-      switch(_buttonId) {
-
-        case ButtonIdentifier::LEFT:
-          handleLeft();
-          break;
-
-        case ButtonIdentifier::RIGHT:
-          handleRight();
-          break;
-
-        case ButtonIdentifier::OK:
-          handleOk();
-          break;
+      if(MillisecondTimer::hasTimedOut(start,1000)) {
+        _temperature.redraw(_panel);
+        start=MillisecondTimer::millis();
       }
 
-      // ready for the next press
+      if(_buttonPressed) {
 
-      _buttonPressed=false;
+        // interrupt handler has indicated that a button is down
+
+        switch(_buttonId) {
+
+          case ButtonIdentifier::LEFT:
+            handleLeft();
+            break;
+
+          case ButtonIdentifier::RIGHT:
+            handleRight();
+            break;
+
+          case ButtonIdentifier::OK:
+            handleOk();
+            break;
+        }
+
+        // ready for the next press
+
+        _buttonPressed=false;
+      }
     }
 
     // unsubscribe from button events

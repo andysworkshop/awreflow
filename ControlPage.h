@@ -29,6 +29,7 @@ namespace awreflow {
 
       bool _leadedChecked;
       bool _captive;
+      TemperatureControlWriter _temperature;
 
       volatile bool _buttonPressed;
       volatile ButtonIdentifier _buttonId;
