@@ -17,6 +17,10 @@ namespace awreflow {
 
   struct Max6675TemperatureReader : TemperatureReader<Max6675TemperatureReader> {
 
+    /*
+     * SPI definitions
+     */
+
     enum {
       Port_NSS = GPIOA_BASE,
       Port_SCK = GPIOA_BASE,
@@ -27,6 +31,10 @@ namespace awreflow {
       Pin_SCK  = GPIO_Pin_5,
       Pin_MISO = GPIO_Pin_6,
       Pin_MOSI = GPIO_Pin_7
+    };
+
+    enum {
+      CALIBRATION_OFFSET = -5
     };
 
     Result readTemperature();

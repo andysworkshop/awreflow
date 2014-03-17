@@ -18,6 +18,9 @@ namespace awreflow {
 
   class TemperatureControlWriter : public IntegerNumberWriter {
 
+    protected:
+      uint16_t _lastWidth;
+
     public:
       TemperatureControlWriter();
 

@@ -68,7 +68,14 @@ namespace awreflow {
 
     // got a valid value
 
-    value=(value & 0x7FF8) >> 3;
+    value=(value & 0x7FF8) >> 5;
+
+    // adjust for the calibration offset
+
+    if(CALIBRATION_OFFSET>0)
+      value+=CALIBRATION_OFFSET;
+    else
+      value-=-CALIBRATION_OFFSET;
 
     // return it
 

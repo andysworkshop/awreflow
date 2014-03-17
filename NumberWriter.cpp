@@ -26,7 +26,7 @@ namespace awreflow {
    * Write out the number and return the width in pixels. The previous number, if any, is completely erased
    */
 
-  uint16_t NumberWriter::write(Flash& flash,const Point& p,const char *buffer) const {
+  uint16_t NumberWriter::write(Flash& flash,const Point& p,const char *buffer) {
 
     const char *ptr;
     const Digit *digit;
@@ -67,14 +67,18 @@ namespace awreflow {
 
     // if the new width is less than the previous width then we need to wipe out the overflow
 
-    if(_lastWidth && width<_lastWidth) {
+    if(width<_lastWidth) {
 
       Panel::LcdPanel& gl(flash.getGraphicsLibrary());
 
       rc.Width=_lastWidth-width;
       gl.setBackground(_backgroundColour);
       gl.clearRectangle(rc);
+
+      _lastWidth=width;
     }
+
+    _lastWidth=width;
 
     // return the width
 

@@ -14,7 +14,7 @@ namespace awreflow {
    * Constructor
    */
 
-  IntegerNumberWriter::IntegerNumberWriter(Panel::tCOLOUR bgColour,Digit *digits,uint8_t height)
+  IntegerNumberWriter::IntegerNumberWriter(Panel::tCOLOUR bgColour,const Digit *digits,uint8_t height)
     : NumberWriter(bgColour,digits,height) {
   }
 
@@ -23,7 +23,7 @@ namespace awreflow {
    * Write out the number and return the width in pixels
    */
 
-  uint16_t IntegerNumberWriter::write(Flash& flash,const Point& p,uint32_t number) const {
+  uint16_t IntegerNumberWriter::write(Flash& flash,const Point& p,uint32_t number) {
 
     char buffer[10];
 

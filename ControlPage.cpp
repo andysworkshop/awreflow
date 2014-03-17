@@ -29,7 +29,7 @@ namespace awreflow {
 
     { 227,212,186,128, 0x8e959d, 0x7a828c,
         FlashInfo::FLAME::OFFSET,FlashInfo::FLAME::WIDTH,FlashInfo::FLAME::HEIGHT,FlashInfo::FLAME::LENGTH,
-        FlashInfo::DEGREESC::OFFSET,FlashInfo::DEGREESC::WIDTH,FlashInfo::DEGREESC::HEIGHT,FlashInfo::DEGREESC::LENGTH },
+        UiButton::NO_GRAPHIC, 0,0,0 },
 
     { 433,64,186,78, 0x4d77ba, 0x2e5fae,
         UiButton::NO_GRAPHIC, 0,0,0,

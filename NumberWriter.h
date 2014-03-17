@@ -32,7 +32,7 @@ namespace awreflow {
       uint16_t _lastWidth;                // last output width for this number
 
     protected:
-      uint16_t write(Flash& flash,const Point& p,const char *buffer) const;
+      uint16_t write(Flash& flash,const Point& p,const char *buffer);
 
     public:
       NumberWriter(Panel::tCOLOUR bgColour,const Digit *digits,uint8_t height);
