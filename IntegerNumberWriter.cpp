@@ -23,19 +23,13 @@ namespace awreflow {
    * Write out the number and return the width in pixels
    */
 
-  uint16_t IntegerNumberWriter::write(uint16_t number) {
+  uint16_t IntegerNumberWriter::write(const Point& p,uint32_t number) const {
 
     char buffer[10];
-    const char *ptr;
 
-    // convert to ascii
+    // convert to ascii and write
 
     StringUtil::modp_uitoa10(number,buffer);
-
-    // parse the buffer
-
-    for(ptr=buffer;*ptr;ptr++) {
-
-    }
+    return NumberWriter::write(p,buffer);
   }
 }
