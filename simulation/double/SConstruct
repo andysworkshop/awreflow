@@ -1,5 +1,0 @@
-# build script
-
-env = Environment()
-env.Program(target='double', source=['Double.cpp','Pid.cpp'])
-env.Append(CCFLAGS = ['-g','-std=gnu++0x'])
