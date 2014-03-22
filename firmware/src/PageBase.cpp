@@ -11,6 +11,34 @@ namespace awreflow {
 
 
   /*
+   * Constructor
+   */
+
+  PageBase::PageBase(Panel& panel,Buttons& buttons)
+    : _panel(panel),
+      _gl(panel.getGraphicsLibrary()),
+      _buttons(buttons),
+      _buttonPressed(false) {
+
+    // subscribe to button events
+
+    _buttons.ButtonPressedEventSender.insertSubscriber(ButtonPressedEventSourceSlot::bind(this,&PageBase::onButtonPressed));
+  }
+
+
+  /*
+   * Destructor
+   */
+
+  PageBase::~PageBase() {
+
+    // unsubscribe from button events
+
+    _buttons.ButtonPressedEventSender.removeSubscriber(ButtonPressedEventSourceSlot::bind(this,&ControlPage::onButtonPressed));
+  }
+
+
+  /*
    * Redraw the buttons
    */
 
@@ -69,6 +97,17 @@ namespace awreflow {
 
 
   /*
+   * Fade out and clear the screen
+   */
+
+  void PageBase::fadeAndClear() {
+    _panel.setBacklight(0);
+    MillisecondTimer::delay(1000);
+    clearBackground();
+  }
+
+
+  /*
    * Redraw the buttons
    */
 
@@ -78,5 +117,21 @@ namespace awreflow {
 
     gl.setBackground(ColourNames::BLACK);
     gl.clearScreen();
+  }
+
+
+  /*
+   * Subscription callback for button events. This is IRQ code so don't
+   * get carried away with your code here.
+   */
+
+  void PageBase::onButtonPressed(ButtonIdentifier id) {
+
+    // if the main thread is ready for another event then signal it
+
+    if(!_buttonPressed) {
+      _buttonPressed=true;
+      _buttonId=id;
+    }
   }
 }

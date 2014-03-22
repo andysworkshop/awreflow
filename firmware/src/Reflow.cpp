@@ -28,6 +28,8 @@ namespace awreflow {
     // to ensure we minimise our concurrent use of that precious 8Kb of SRAM
 
     ControlPage *controlPage;
+    ReflowPage *reflowPage;
+#if 0
     SplashScreen *splashScreen;
 
     // show the splash screen
@@ -35,15 +37,26 @@ namespace awreflow {
     splashScreen=new SplashScreen;
     splashScreen->show(panel);
     delete splashScreen;
+#endif
+
+    // go into a loop showing the control page followed by the reflow page
 
     for(;;) {
 
-      // create the options page and run it. it won't ever return unless the user
+      ReflowParameters params;
+
+      // create the options page and run it. it won't return until the user
       // selects a cooking program and opts to proceed.
 
       controlPage=new ControlPage(panel,buttons);
-      controlPage->run();
+      params=controlPage->run();
       delete controlPage;
+
+      // create the reflow page and run it
+
+      reflowPage=new ReflowPage(panel,buttons,params);
+      reflowPage->run();
+      delete reflowPage;
     }
   }
 

@@ -46,16 +46,13 @@ namespace awreflow {
 
 
   /*
-   * Run the options page
+   * Run the options page and return what the user selected when they click
+   * on the reflow button
    */
 
-  void ControlPage::run() {
+  ReflowParameters ControlPage::run() {
 
     uint32_t start;
-
-    // subscribe to button events
-
-    _buttons.ButtonPressedEventSender.insertSubscriber(ButtonPressedEventSourceSlot::bind(this,&ControlPage::onButtonPressed));
 
     // draw the full GUI
 
@@ -63,7 +60,9 @@ namespace awreflow {
 
     // go into a keypress/timeout event loop
 
-    for(start=MillisecondTimer::millis();;) {
+    start=MillisecondTimer::millis();
+
+    for(;;) {
 
       // each second, sample the temperature and display it
 
@@ -87,7 +86,19 @@ namespace awreflow {
             break;
 
           case ButtonIdentifier::OK:
-            handleOk();
+            if(handleOk()) {
+
+              // user has clicked reflow, return the parameters we gathered on this page
+
+              ReflowParameters params;
+
+              params.P=_p.getValue();
+              params.I=_i.getValue();
+              params.D=_d.getValue();
+              params.Leaded=_leadedChecked;
+
+              return params;
+            }
             break;
         }
 
@@ -96,10 +107,6 @@ namespace awreflow {
         _buttonPressed=false;
       }
     }
-
-    // unsubscribe from button events
-
-    _buttons.ButtonPressedEventSender.removeSubscriber(ButtonPressedEventSourceSlot::bind(this,&ControlPage::onButtonPressed));
   }
 
 
@@ -248,7 +255,7 @@ namespace awreflow {
    * Handle the OK button
    */
 
-  void ControlPage::handleOk() {
+  bool ControlPage::handleOk() {
 
     if(_captive) {
       _captive=false;
@@ -277,10 +284,17 @@ namespace awreflow {
           }
           break;
 
+        case REFLOW:
+          return true;      // trigger this class to exit
+
         default:
           break;
       }
     }
+
+    // no exit from the page
+
+    return false;
   }
 
 
@@ -294,9 +308,7 @@ namespace awreflow {
 
     // fade out (it's asynchronous and takes about a second)
 
-    _panel.setBacklight(0);
-    MillisecondTimer::delay(1000);
-    clearBackground();
+    fadeAndClear();
 
     // draw the lot
 
@@ -330,7 +342,7 @@ namespace awreflow {
    * Draw the selection box
    */
 
-  void ControlPage::drawSelection(bool draw) {
+  void ControlPage::drawSelection(bool draw) const {
 
     // selection box
 
@@ -347,7 +359,7 @@ namespace awreflow {
    * Draw the check box
    */
 
-  void ControlPage::drawCheck(Flash& flash) {
+  void ControlPage::drawCheck(Flash& flash) const {
 
     // check box
 
@@ -368,7 +380,7 @@ namespace awreflow {
       uint32_t offset,
       uint32_t length,
       Panel::tCOLOUR colour,
-      uint8_t deselbtn) {
+      uint8_t deselbtn) const {
 
     // draw the checkbox
 
@@ -388,21 +400,5 @@ namespace awreflow {
                   GuiButtons[deselbtn].Y+7,
                   26,
                   26));
-  }
-
-
-  /*
-   * Subscription callback for button events. This is IRQ code so don't
-   * get carried away with your code here.
-   */
-
-  void ControlPage::onButtonPressed(ButtonIdentifier id) {
-
-    // if the main thread is ready for another event then signal it
-
-    if(!_buttonPressed) {
-      _buttonPressed=true;
-      _buttonId=id;
-    }
   }
 }

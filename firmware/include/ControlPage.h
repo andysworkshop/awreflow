@@ -34,24 +34,20 @@ namespace awreflow {
       BlueIntegerWriter _i;
       BlueIntegerWriter _d;
 
-      volatile bool _buttonPressed;
-      volatile ButtonIdentifier _buttonId;
-
     protected:
       void redrawAll();
       void drawSelectionAndCheck(Flash& flash,bool draw);
-      void drawSelection(bool draw);
-      void drawCheck(Flash& flash);
-      void drawCheck(Flash& flash,uint8_t selbtn,uint32_t offset,uint32_t length,Panel::tCOLOUR colour,uint8_t deselbtn);
-      void onButtonPressed(ButtonIdentifier id);
-      void handleOk();
+      void drawSelection(bool draw) const;
+      void drawCheck(Flash& flash) const;
+      void drawCheck(Flash& flash,uint8_t selbtn,uint32_t offset,uint32_t length,Panel::tCOLOUR colour,uint8_t deselbtn) const;
       void handleRight();
       void handleLeft();
+      bool handleOk();
 
     public:
       ControlPage(Panel& panel,Buttons& buttons);
 
-      void run();
+      ReflowParameters run();
   };
 
 
@@ -66,7 +62,6 @@ namespace awreflow {
       _captive(false),
       _p(1,0,999,Point(500,85)),
       _i(1,0,999,Point(500,182)),
-      _d(1,0,999,Point(500,280)),
-      _buttonPressed(false) {
+      _d(1,0,999,Point(500,280)) {
   }
 }

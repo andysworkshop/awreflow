@@ -21,23 +21,18 @@ namespace awreflow {
       Panel::LcdPanel& _gl;
       Buttons& _buttons;
 
+      volatile bool _buttonPressed;
+      volatile ButtonIdentifier _buttonId;
+
     protected:
       void clearBackground();
       void drawButtons(Flash& flash,const UiButton *buttons,uint8_t numButtons);
       void drawButton(Flash& flash,const UiButton *button);
+      void onButtonPressed(ButtonIdentifier id);
+      void fadeAndClear();
 
     public:
       PageBase(Panel& panel,Buttons& buttons);
+      ~PageBase();
   };
-
-
-  /*
-   * Constructor
-   */
-
-  inline PageBase::PageBase(Panel& panel,Buttons& buttons)
-    : _panel(panel),
-      _gl(panel.getGraphicsLibrary()),
-      _buttons(buttons) {
-  }
 }

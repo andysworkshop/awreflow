@@ -1,6 +1,6 @@
 #!/bin/sh
 
-bm2rgbi=../../stm32plus/utils/bm2rgbi/bm2rgbi/bin/Release/bm2rgbi.exe
+bm2rgbi=../../../stm32plus/utils/bm2rgbi/bm2rgbi/bin/Release/bm2rgbi.exe
 
 if [ ! -x ${bm2rgbi} ] ; then
   echo "bm2rgbi not found at ${bm2rgbi}"
