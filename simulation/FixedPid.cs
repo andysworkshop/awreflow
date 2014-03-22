@@ -3,16 +3,16 @@
 
 namespace @double {
 
-  public class Pid {
+  public class FixedPid {
 
-    protected double _kp;
-    protected double _ki;
-    protected double _kd;
+    protected int _kp;
+    protected int _ki;
+    protected int _kd;
 
-    protected double _lastError;
-    protected double _integral;
+    protected int _lastError;
+    protected int _integral;
 
-    public Pid(double kp,double ki,double kd) {
+    public FixedPid(int kp,int ki,int kd) {
     
       _kp=kp;
       _ki=ki;
@@ -21,9 +21,9 @@ namespace @double {
       _integral=0;
     }
 
-    public byte update(double desiredTemperature,double currentTemperature) {
+    public byte update(int desiredTemperature,int currentTemperature) {
 
-      double error,pwm,derivative;
+      int error,pwm,derivative;
 
       // current error term is the difference between desired and current temperature
 
@@ -40,7 +40,7 @@ namespace @double {
       // calculate the control variable
 
       pwm=(_kp*error)+(_ki*_integral)+(_kd*derivative);
-      pwm=Math.Max(Math.Min(255.0,pwm),0.0);
+      pwm=Math.Max(Math.Min(255,pwm),0);
 
       // save the last error
 

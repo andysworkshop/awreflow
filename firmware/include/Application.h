@@ -38,6 +38,7 @@ using namespace stm32plus::display;
 #include "NumberWriter.h"
 #include "IntegerNumberWriter.h"
 #include "TemperatureControlWriter.h"
+#include "BlueIntegerWriter.h"
 #include "ControlPage.h"
 #include "Reflow.h"
 #include "SplashScreen.h"

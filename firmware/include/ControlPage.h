@@ -30,6 +30,9 @@ namespace awreflow {
       bool _leadedChecked;
       bool _captive;
       TemperatureControlWriter _temperature;
+      BlueIntegerWriter _p;
+      BlueIntegerWriter _i;
+      BlueIntegerWriter _d;
 
       volatile bool _buttonPressed;
       volatile ButtonIdentifier _buttonId;
@@ -61,6 +64,9 @@ namespace awreflow {
       _selectedButton(REFLOW),
       _leadedChecked(true),
       _captive(false),
+      _p(1,0,999,Point(500,85)),
+      _i(1,0,999,Point(500,182)),
+      _d(1,0,999,Point(500,280)),
       _buttonPressed(false) {
   }
 }

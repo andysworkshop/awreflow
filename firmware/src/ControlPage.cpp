@@ -109,42 +109,67 @@ namespace awreflow {
 
   void ControlPage::handleLeft() {
 
-    // erase old selection
+    // if captive then we adjust the number
 
-    drawSelection(false);
+    if(_captive) {
+      switch(_selectedButton) {
+        case PROPORTIONAL:
+          --_p;
+          _p.redraw(_panel);
+          break;
 
-    // set the new selection
+        case INTEGER:
+          --_i;
+          _i.redraw(_panel);
+          break;
 
-    switch(_selectedButton) {
+        case DERIVATIVE:
+          --_d;
+          _d.redraw(_panel);
+          break;
 
-      case LEADED:
-        _selectedButton=DERIVATIVE;
-        break;
-
-      case LEAD_FREE:
-        _selectedButton=REFLOW;
-        break;
-
-      case REFLOW:
-        _selectedButton=LEADED;
-        break;
-
-      case PROPORTIONAL:
-        _selectedButton=LEAD_FREE;
-        break;
-
-      case INTEGER:
-        _selectedButton=PROPORTIONAL;
-        break;
-
-      case DERIVATIVE:
-        _selectedButton=INTEGER;
-        break;
+        default:
+          break;
+      }
     }
+    else {
+      // erase old selection
 
-    // draw the new selection
+      drawSelection(false);
 
-    drawSelection(true);
+      // set the new selection
+
+      switch(_selectedButton) {
+
+        case LEADED:
+          _selectedButton=DERIVATIVE;
+          break;
+
+        case LEAD_FREE:
+          _selectedButton=REFLOW;
+          break;
+
+        case REFLOW:
+          _selectedButton=LEADED;
+          break;
+
+        case PROPORTIONAL:
+          _selectedButton=LEAD_FREE;
+          break;
+
+        case INTEGER:
+          _selectedButton=PROPORTIONAL;
+          break;
+
+        case DERIVATIVE:
+          _selectedButton=INTEGER;
+          break;
+      }
+
+      // draw the new selection
+
+      drawSelection(true);
+    }
   }
 
 
@@ -154,42 +179,68 @@ namespace awreflow {
 
   void ControlPage::handleRight() {
 
-    // erase old selection
+    // if captive then we adjust the number
 
-    drawSelection(false);
+    if(_captive) {
+      switch(_selectedButton) {
+        case PROPORTIONAL:
+          ++_p;
+          _p.redraw(_panel);
+          break;
 
-    // set the new selection
+        case INTEGER:
+          ++_i;
+          _i.redraw(_panel);
+          break;
 
-    switch(_selectedButton) {
+        case DERIVATIVE:
+          ++_d;
+          _d.redraw(_panel);
+          break;
 
-      case LEADED:
-        _selectedButton=REFLOW;
-        break;
-
-      case LEAD_FREE:
-        _selectedButton=PROPORTIONAL;
-        break;
-
-      case REFLOW:
-        _selectedButton=LEAD_FREE;
-        break;
-
-      case PROPORTIONAL:
-        _selectedButton=INTEGER;
-        break;
-
-      case INTEGER:
-        _selectedButton=DERIVATIVE;
-        break;
-
-      case DERIVATIVE:
-        _selectedButton=LEADED;
-        break;
+        default:
+          break;
+      }
     }
+    else {
 
-    // draw the new selection
+      // erase old selection
 
-    drawSelection(true);
+      drawSelection(false);
+
+      // set the new selection
+
+      switch(_selectedButton) {
+
+        case LEADED:
+          _selectedButton=REFLOW;
+          break;
+
+        case LEAD_FREE:
+          _selectedButton=PROPORTIONAL;
+          break;
+
+        case REFLOW:
+          _selectedButton=LEAD_FREE;
+          break;
+
+        case PROPORTIONAL:
+          _selectedButton=INTEGER;
+          break;
+
+        case INTEGER:
+          _selectedButton=DERIVATIVE;
+          break;
+
+        case DERIVATIVE:
+          _selectedButton=LEADED;
+          break;
+      }
+
+      // draw the new selection
+
+      drawSelection(true);
+    }
   }
 
 
@@ -210,7 +261,7 @@ namespace awreflow {
         case PROPORTIONAL:
         case INTEGER:
         case DERIVATIVE:
-          _captive=true;      // move into the captive state where left/right are directed to these buttons
+          _captive^=true;       // move into/out of the captive state where left/right are directed to these buttons
           drawSelection(true);
           break;
 
@@ -254,6 +305,10 @@ namespace awreflow {
     drawButtons(flash,GuiButtons,sizeof(GuiButtons)/sizeof(GuiButtons[0]));
     drawSelectionAndCheck(flash,true);
 
+    _p.redraw(_panel);
+    _i.redraw(_panel);
+    _d.redraw(_panel);
+
     // lights back on
 
     _panel.setBacklight(95);
@@ -268,7 +323,6 @@ namespace awreflow {
 
     drawSelection(draw);
     drawCheck(flash);
-
   }
 
 

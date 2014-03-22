@@ -48,7 +48,7 @@ namespace awreflow {
     // calculate the control variable
 
     pwm=(_kp*error)+(_ki*_integral)+(_kd*derivative);
-    pwm=Max(Min(255,pwm),0);
+    pwm=Max(Min(255.0,pwm),0.0);
 
     // save the last error
 
