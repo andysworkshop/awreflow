@@ -11,8 +11,7 @@ examples/*/build/
 
 # eclipse settings
 
-lib/.settings/
-examples/.settings/
+.settings/
 
 # eclipse output
 
