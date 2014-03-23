@@ -10,10 +10,8 @@
 namespace awreflow {
 
   /*
-   * This class manages writing bitmaps from SPI flash on to the display.
+   * Base flash class looks after the SPI and DMA communications
    */
-
-  class Panel;
 
   class Flash {
 
@@ -55,26 +53,33 @@ namespace awreflow {
       MyTxDma *_txdma;
 
       /*
-       * The panel
+       * Inner class to manage the NSS pin using the
+       * Resource Acquisition Is Initialisation technique
        */
 
-      Panel& _panel;
+      struct SpiNssManager {
+        const MySpi& _spi;
+
+        SpiNssManager(const MySpi& spi)
+          : _spi(spi) {
+          _spi.setNss(false);
+        }
+        ~SpiNssManager() {
+          _spi.setNss(true);
+        }
+      };
+
+    protected:
+      bool waitForIdle() const;
+      bool writeEnable() const;
+      bool readStatusRegister(uint8_t& sr) const;
 
     public:
-      Flash(Panel& panel);
+      Flash();
       ~Flash();
 
-      void drawBitmap(const Rectangle& rc,uint32_t offset,uint32_t length);
-
-      Panel::LcdPanel& getGraphicsLibrary();
+      bool eraseLastSector() const;
+      bool writeLastPage(const uint8_t *page) const;
+      bool readLastPage(uint8_t *page) const;
   };
-
-
-  /*
-   * Convenience method to get the graphics library object
-   */
-
-  inline Panel::LcdPanel& Flash::getGraphicsLibrary() {
-    return _panel.getGraphicsLibrary();
-  }
 }

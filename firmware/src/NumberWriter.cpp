@@ -26,7 +26,7 @@ namespace awreflow {
    * Write out the number and return the width in pixels. The previous number, if any, is completely erased
    */
 
-  uint16_t NumberWriter::write(Flash& flash,const Point& p,const char *buffer) {
+  uint16_t NumberWriter::write(FlashGraphics& flash,const Point& p,const char *buffer) {
 
     const char *ptr;
     const Digit *digit;

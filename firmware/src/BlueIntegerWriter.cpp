@@ -50,7 +50,7 @@ namespace awreflow {
 
     // declare the flash device
 
-    Flash flash(panel);
+    FlashGraphics flash(panel);
 
     // write the number
 

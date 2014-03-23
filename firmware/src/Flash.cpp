@@ -13,8 +13,7 @@ namespace awreflow {
    * Constructor
    */
 
-  Flash::Flash(Panel& panel) :
-    _panel(panel) {
+  Flash::Flash() {
 
     // create the peripheral. this will initialise it
 
@@ -51,93 +50,169 @@ namespace awreflow {
 
 
   /*
-   * Read the bitmap from SPI and write it out to the display
-   * We'll use the Read Data (03H) command because our max frequency of 24MHz
-   * is lower than the device's max of 44MHz so we don't have to use the Fast Read
-   * command that would incur a speed penalty due to the dummy writes.
-   *
-   * The strategy here is to use DMA to read in the bitmap from the flash device into
-   * a buffer in chunks. When half the buffer is full we transfer it to the display
-   * while DMA is filling the remainder. When DMA has filled the remainder we transfer
-   * it to the display. This allows us to get a good utilisation out of the SPI bus.
-   *
-   * Note that in master mode the SPI clock will not tick unless we transmit something.
-   * Without a ticking clock the flash slave device will not latch out the data. Therefore
-   * we use DMA to "transmit" fake zero bytes just to get the clock to tick so that there
-   * will be data for us to receive. This is one of the oddities of ST's SPI implementation
-   * that you just have to learn.
+   * Erase the last sector of the device. The smallest eraseable unit is a 4096
+   * byte sector.
    */
 
-  void Flash::drawBitmap(const Rectangle& rc,uint32_t offset,uint32_t length) {
+  bool Flash::eraseLastSector() const {
 
-     uint8_t zero,bytes[4];
-     uint8_t *buffer;
-     Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
-     Panel::LcdAccessMode& accessMode(_panel.getAccessMode());
+    uint8_t command[4];
+    bool retval;
 
-     // set up the drawing rectangle and get ready for receiving data
+    // create the command (0x20 + 24 bit address)
+    // address = 1048576 - 4096 = 0x0FF000
 
-     gl.moveTo(rc);
-     gl.beginWriting();
+    command[0]=0x20;
+    command[1]=0x0F;
+    command[2]=0xF0;
+    command[3]=0x00;
 
-     // first 32-bits are the read command and the offset
+    // sector erase requires write-enable
 
-     bytes[0]='\x3';
-     bytes[1]=(offset >> 16) & 0xff;
-     bytes[2]=(offset >> 8) & 0xff;
-     bytes[3]=offset & 0xff;
+    if(!writeEnable())
+      return false;
 
-     // select our device
+    // send the simple command
 
-     _spi->setNss(false);
+    _spi->setNss(false);
+    retval=_spi->send(command,sizeof(command));
+    _spi->setNss(true);
 
-     // write out as two 16-bit transfers
+    // wait for it to finish
 
-     _spi->send(bytes,4);
-
-     // get a temporary buffer and set the dummy byte to zero
-
-     buffer=new uint8_t[READ_BUFFER_SIZE];
-     zero=0;
-
-     while(length>=READ_BUFFER_SIZE) {
-
-       // start a read and wait for half complete
-
-       _rxdma->beginRead(buffer,READ_BUFFER_SIZE);
-       _txdma->beginWrite(&zero,READ_BUFFER_SIZE);
-
-       while(!_rxdma->isHalfComplete());
-
-       // transfer the first half to the display while the other half is finishing off
-
-       accessMode.rawTransfer(buffer,READ_BUFFER_SIZE/4);
-
-       // wait for the full complete
-
-       while(!_rxdma->isComplete());
-
-       // transfer the second half
-
-       accessMode.rawTransfer(&buffer[READ_BUFFER_SIZE/2],READ_BUFFER_SIZE/4);
-       length-=READ_BUFFER_SIZE/2;
-     }
-
-     if(length>0) {
-
-       // receive and transfer synchronously
-
-       _spi->receive(buffer,length);
-       accessMode.rawTransfer(buffer,length/2);
-     }
+    return retval ? waitForIdle() : false;
+  }
 
 
-     // clean up
+  /*
+   * Write the last page. It's actually the first programmable 256 byte page
+   * in the last 4096 byte sector.
+   */
 
-     delete [] buffer;
+  bool Flash::writeLastPage(const uint8_t *page) const {
 
-     // deselect our device
+    uint8_t command[4];
 
-     _spi->setNss(true);
-   }
+    // create the command (0x02 + 24 bit address)
+    // address = 1048576 - 4096 = 0x0FF000
+
+    command[0]=0x02;
+    command[1]=0x0F;
+    command[2]=0xF0;
+    command[3]=0x00;
+
+    // page program requires write-enable
+
+    if(!writeEnable())
+      return false;
+
+    // send the 4 byte command. nss must go high after the page program or the
+    // write will not happen.
+
+    {
+      SpiNssManager mgr(*_spi);
+
+      if(!_spi->send(command,sizeof(command)))
+        return false;
+
+      // send the 256 bytes
+
+      if(!_spi->send(page,256))
+        return false;
+    }
+
+    return waitForIdle();
+  }
+
+
+  /*
+   * Read the last page. It's actually the first programmable 256 byte page
+   * in the last 4096 byte sector.
+   */
+
+  bool Flash::readLastPage(uint8_t *page) const {
+
+    uint8_t command[4];
+
+    // create the command (0x02 + 24 bit address)
+    // address = 1048576 - 4096 = 0x0FF000
+
+    command[0]=0x03;
+    command[1]=0x0F;
+    command[2]=0xF0;
+    command[3]=0x00;
+
+    // manage the NSS pin
+
+    SpiNssManager mgr(*_spi);
+
+    // send the 4 byte command
+
+    if(!_spi->send(command,sizeof(command)))
+      return false;
+
+    // receive the 256 bytes
+
+    return _spi->receive(page,256);
+  }
+
+
+  /*
+   * Read the SPI device status register. We need to do this so we can
+   * see the IDLE bit
+   */
+
+  bool Flash::readStatusRegister(uint8_t& sr) const {
+
+    uint8_t command;
+
+    command=0x5;
+
+    // send the 1 byte command
+
+    SpiNssManager nss(*_spi);
+
+    if(!_spi->send(&command,1))
+      return false;
+
+    // receive the single byte
+
+    return _spi->receive(&sr,1);
+  }
+
+
+  /*
+   * Wait for the flash device to become idle
+   */
+
+  bool Flash::waitForIdle() const {
+
+    uint8_t sr;
+
+    do {
+
+      if(!readStatusRegister(sr))
+        return false;
+
+    } while((sr & 1)!=0);     // bit zero is WIP (write in progress)
+
+    return true;
+  }
+
+
+  /*
+   * Send the write-enable command
+   */
+
+  bool Flash::writeEnable() const {
+
+    uint8_t command;
+
+    command=0x6;
+
+    // send the 1 byte command
+
+    SpiNssManager nss(*_spi);
+    return _spi->send(&command,1);
+  }
 }

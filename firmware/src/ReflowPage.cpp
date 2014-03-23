@@ -153,7 +153,7 @@ namespace awreflow {
 
   void ReflowPage::redrawAll() {
 
-    Flash flash(_panel);
+    FlashGraphics flash(_panel);
 
     // fade out (it's asynchronous and takes about a second)
 
@@ -177,7 +177,7 @@ namespace awreflow {
    * Draw both axes
    */
 
-  void ReflowPage::drawAxes(Flash& flash) const {
+  void ReflowPage::drawAxes(FlashGraphics& flash) const {
 
     Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
 
@@ -226,7 +226,7 @@ namespace awreflow {
    * Draw the reflow profile
    */
 
-  void ReflowPage::drawProfile(Flash& flash) const {
+  void ReflowPage::drawProfile(FlashGraphics& flash) const {
 
     uint8_t i;
     uint32_t height,width;
@@ -330,7 +330,7 @@ namespace awreflow {
    * Draw the temperature icon
    */
 
-  void ReflowPage::drawTemperatureIcon(Flash& flash) {
+  void ReflowPage::drawTemperatureIcon(FlashGraphics& flash) {
 
     // this is the thermometer at the top of the purple box
 

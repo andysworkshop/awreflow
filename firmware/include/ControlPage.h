@@ -36,16 +36,16 @@ namespace awreflow {
 
     protected:
       void redrawAll();
-      void drawSelectionAndCheck(Flash& flash,bool draw);
+      void drawSelectionAndCheck(FlashGraphics& flash,bool draw);
       void drawSelection(bool draw) const;
-      void drawCheck(Flash& flash) const;
-      void drawCheck(Flash& flash,uint8_t selbtn,uint32_t offset,uint32_t length,Panel::tCOLOUR colour,uint8_t deselbtn) const;
+      void drawCheck(FlashGraphics& flash) const;
+      void drawCheck(FlashGraphics& flash,uint8_t selbtn,uint32_t offset,uint32_t length,Panel::tCOLOUR colour,uint8_t deselbtn) const;
       void handleRight();
       void handleLeft();
       bool handleOk();
 
     public:
-      ControlPage(Panel& panel,Buttons& buttons);
+      ControlPage(Panel& panel,Buttons& buttons,const ReflowParameters& params);
 
       ReflowParameters run();
   };
@@ -55,13 +55,13 @@ namespace awreflow {
    * Constructor
    */
 
-  inline ControlPage::ControlPage(Panel& panel,Buttons& buttons)
+  inline ControlPage::ControlPage(Panel& panel,Buttons& buttons,const ReflowParameters& params)
     : PageBase(panel,buttons),
       _selectedButton(REFLOW),
-      _leadedChecked(true),
+      _leadedChecked(params.Leaded),
       _captive(false),
-      _p(1,0,999,Point(500,85)),
-      _i(1,0,999,Point(500,182)),
-      _d(1,0,999,Point(500,280)) {
+      _p(params.P,0,999,Point(500,85)),
+      _i(params.I,0,999,Point(500,182)),
+      _d(params.D,0,999,Point(500,280)) {
   }
 }

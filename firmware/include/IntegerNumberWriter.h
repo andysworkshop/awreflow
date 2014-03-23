@@ -21,6 +21,6 @@ namespace awreflow {
     public:
       IntegerNumberWriter(Panel::tCOLOUR bgColour,const Digit *digits,uint8_t height);
 
-      uint16_t write(Flash& flash,const Point& p,uint32_t number);
+      uint16_t write(FlashGraphics& flash,const Point& p,uint32_t number);
   };
 }

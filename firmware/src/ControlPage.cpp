@@ -277,7 +277,7 @@ namespace awreflow {
           {
             // change the selected profile to leaded/unleaded
 
-            Flash flash(_panel);
+            FlashGraphics flash(_panel);
 
             _leadedChecked=_selectedButton==LEADED;
             drawCheck(flash);
@@ -304,7 +304,7 @@ namespace awreflow {
 
   void ControlPage::redrawAll() {
 
-    Flash flash(_panel);
+    FlashGraphics flash(_panel);
 
     // fade out (it's asynchronous and takes about a second)
 
@@ -331,7 +331,7 @@ namespace awreflow {
    * Draw the selection and check boxes
    */
 
-  void ControlPage::drawSelectionAndCheck(Flash& flash,bool draw) {
+  void ControlPage::drawSelectionAndCheck(FlashGraphics& flash,bool draw) {
 
     drawSelection(draw);
     drawCheck(flash);
@@ -359,7 +359,7 @@ namespace awreflow {
    * Draw the check box
    */
 
-  void ControlPage::drawCheck(Flash& flash) const {
+  void ControlPage::drawCheck(FlashGraphics& flash) const {
 
     // check box
 
@@ -375,7 +375,7 @@ namespace awreflow {
    */
 
   void ControlPage::drawCheck(
-      Flash& flash,
+      FlashGraphics& flash,
       uint8_t selbtn,
       uint32_t offset,
       uint32_t length,

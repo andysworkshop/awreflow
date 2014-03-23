@@ -67,11 +67,11 @@ namespace awreflow {
     protected:
       void redrawAll();
       void drawSelection(bool draw) const;
-      void drawTemperatureIcon(Flash& flash);
+      void drawTemperatureIcon(FlashGraphics& flash);
       void handleDirection();
       bool handleOk();
-      void drawAxes(Flash& flash) const;
-      void drawProfile(Flash& flash) const;
+      void drawAxes(FlashGraphics& flash) const;
+      void drawProfile(FlashGraphics& flash) const;
       void wideLine(Panel::LcdPanel& gl,const Point& p1,const Point& p2,Panel::tCOLOUR cr) const;
 
     public:

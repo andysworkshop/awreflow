@@ -45,12 +45,23 @@ namespace awreflow {
 
       ReflowParameters params;
 
+      // read the parameters from flash and default them if they're not available
+
+      if(!ReflowParametersStorage::read(params)) {
+        params.P=params.I=params.D=1;
+        params.Leaded=true;
+      }
+
       // create the options page and run it. it won't return until the user
       // selects a cooking program and opts to proceed.
 
-      controlPage=new ControlPage(panel,buttons);
+      controlPage=new ControlPage(panel,buttons,params);
       params=controlPage->run();
       delete controlPage;
+
+      // attempt to store the new parameters in flash
+
+      ReflowParametersStorage::write(params);
 
       // create the reflow page and run it
 

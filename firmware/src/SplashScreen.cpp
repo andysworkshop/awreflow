@@ -16,7 +16,7 @@ namespace awreflow {
 
   void SplashScreen::show(Panel& panel) {
 
-    Flash flash(panel);
+    FlashGraphics flash(panel);
 
     // lights off (this is an async fade)
 

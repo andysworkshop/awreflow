@@ -42,7 +42,7 @@ namespace awreflow {
    * Redraw the buttons
    */
 
-  void PageBase::drawButtons(Flash& flash,const UiButton *buttons,uint8_t numButtons) {
+  void PageBase::drawButtons(FlashGraphics& flash,const UiButton *buttons,uint8_t numButtons) {
 
     const UiButton *button;
 
@@ -55,7 +55,7 @@ namespace awreflow {
    * Draw a single button
    */
 
-  void PageBase::drawButton(Flash& flash,const UiButton *button) {
+  void PageBase::drawButton(FlashGraphics& flash,const UiButton *button) {
 
     uint16_t x,y;
     Panel::LcdPanel& gl(_panel.getGraphicsLibrary());

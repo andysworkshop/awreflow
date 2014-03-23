@@ -23,7 +23,7 @@ namespace awreflow {
    * Write out the number and return the width in pixels
    */
 
-  uint16_t IntegerNumberWriter::write(Flash& flash,const Point& p,uint32_t number) {
+  uint16_t IntegerNumberWriter::write(FlashGraphics& flash,const Point& p,uint32_t number) {
 
     char buffer[10];
 
