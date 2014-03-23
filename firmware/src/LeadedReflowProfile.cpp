@@ -10,12 +10,12 @@
 namespace awreflow {
 
   static const ReflowProfile::Segment ProfileSegments[]= {
-    { 90,  150 },
+    { 90,  150 },       // pre-heating zone
     { 180, 180 },
-    { 200, 210 },
+    { 200, 210 },       // reflow zone
     { 220, 210 },
     { 240, 180 },
-    { 270, 25  }
+    { 270, 25  }        // cool down
   };
 
 
