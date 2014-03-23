@@ -20,6 +20,10 @@ namespace awreflow {
 
     protected:
 
+      /*
+       * The buttons on this page as indexes into the UiButton array
+       */
+
       enum {
         STATUS = 0,
         START  = 1,
@@ -27,11 +31,19 @@ namespace awreflow {
         EXIT   = 3,
       } _selectedButton;
 
+      /*
+       * The states that this page can be operating in
+       */
+
       enum {
         WAITING,
         COOKING,
         FINISHED
       } _mode;
+
+      /*
+       * Graphical constants
+       */
 
       enum {
         TOP_MARGIN    = 10,
@@ -40,7 +52,17 @@ namespace awreflow {
         BOTTOM_MARGIN = 30
       };
 
+      /*
+       * Operational constants
+       */
+
+      enum {
+        ROOM_TEMPERATURE = 25
+      };
+
+
       const ReflowParameters& _params;
+      ReflowProfile *_reflowProfile;
 
     protected:
       void redrawAll();
@@ -49,23 +71,13 @@ namespace awreflow {
       void handleDirection();
       bool handleOk();
       void drawAxes(Flash& flash) const;
-      void wideLine(const Point& p1,const Point& p2,Panel::tCOLOUR cr);
+      void drawProfile(Flash& flash) const;
+      void wideLine(Panel::LcdPanel& gl,const Point& p1,const Point& p2,Panel::tCOLOUR cr) const;
 
     public:
       ReflowPage(Panel& panel,Buttons& buttons,const ReflowParameters& params);
+      ~ReflowPage();
 
       void run();
   };
-
-
-  /*
-   * Constructor
-   */
-
-  inline ReflowPage::ReflowPage(Panel& panel,Buttons& buttons,const ReflowParameters& params)
-    : PageBase(panel,buttons),
-      _selectedButton(START),
-      _mode(WAITING),
-      _params(params) {
-  }
 }

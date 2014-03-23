@@ -11,10 +11,10 @@
 namespace awreflow {
 
 /*
- * The 10 digits for the temperature display
+ * The 10 digits for the coefficient display
  */
 
-  static const NumberWriter::Digit TemperatureDigits[10]=
+  static const NumberWriter::Digit Digits[10]=
   {
     { FlashInfo::N0_BLUE::OFFSET,FlashInfo::N0_BLUE::LENGTH,FlashInfo::N0_BLUE::WIDTH },
     { FlashInfo::N1_BLUE::OFFSET,FlashInfo::N1_BLUE::LENGTH,FlashInfo::N1_BLUE::WIDTH },
@@ -34,7 +34,7 @@ namespace awreflow {
    */
 
   BlueIntegerWriter::BlueIntegerWriter(uint32_t value,uint32_t minvalue,uint32_t maxvalue,const Point& p)
-    : IntegerNumberWriter(0x2e5fae,TemperatureDigits,21),
+    : IntegerNumberWriter(0x2e5fae,Digits,21),
       _location(p),
       _value(value),
       _min(minvalue),

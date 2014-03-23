@@ -17,6 +17,7 @@
 #include "config/button.h"
 #include "config/timer.h"
 #include "config/display/tft.h"
+#include "config/smartptr.h"
 #include "util/MinMax.h"
 
 // make the declarations less verbose
@@ -38,11 +39,13 @@ using namespace stm32plus::display;
 #include "NumberWriter.h"
 #include "IntegerNumberWriter.h"
 #include "TemperatureControlWriter.h"
+#include "AxisNumberWriter.h"
 #include "BlueIntegerWriter.h"
 #include "ReflowParameters.h"
 #include "Pid.h"
 #include "ReflowProfile.h"
 #include "LeadedReflowProfile.h"
+#include "LeadFreeReflowProfile.h"
 #include "ControlPage.h"
 #include "ReflowPage.h"
 #include "Reflow.h"

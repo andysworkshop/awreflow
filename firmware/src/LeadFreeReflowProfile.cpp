@@ -1,4 +1,12 @@
 /*
+ * LeadFreeReflowProfile.cpp
+ *
+ *  Created on: 23 Mar 2014
+ *      Author: andy
+ */
+
+
+/*
  * Andy's Workshop Reflow Oven Controller.
  * Copyright (c) 2014 Andy Brown. All rights reserved.
  * Please see website (http://www.andybrown.me.uk) for full details.
@@ -10,12 +18,12 @@
 namespace awreflow {
 
   static const ReflowProfile::Segment ProfileSegments[]= {
-    { 90,  150 },
-    { 180, 180 },
-    { 200, 210 },
-    { 220, 210 },
-    { 240, 180 },
-    { 270, 25  }
+    { 90, 150 },
+    { 90, 180 },
+    { 20, 210 },
+    { 20, 210 },
+    { 20, 180 },
+    { 30, 25  }
   };
 
 
@@ -23,7 +31,7 @@ namespace awreflow {
    * Constructor
    */
 
-  LeadedReflowProfile::LeadedReflowProfile()
+  LeadFreeReflowProfile::LeadFreeReflowProfile()
     : ReflowProfile(
         ProfileSegments,
         sizeof(ProfileSegments)/sizeof(ProfileSegments[0]),
@@ -31,3 +39,5 @@ namespace awreflow {
         270) {
   }
 }
+
+

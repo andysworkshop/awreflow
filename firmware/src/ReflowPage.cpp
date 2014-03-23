@@ -35,6 +35,32 @@ namespace awreflow {
 
 
   /*
+   * Constructor
+   */
+
+  ReflowPage::ReflowPage(Panel& panel,Buttons& buttons,const ReflowParameters& params)
+    : PageBase(panel,buttons),
+      _selectedButton(START),
+      _mode(WAITING),
+      _params(params) {
+
+    if(params.Leaded)
+      _reflowProfile=new LeadedReflowProfile;
+    else
+      _reflowProfile=new LeadFreeReflowProfile;
+  }
+
+
+  /*
+   * Destructor
+   */
+
+  ReflowPage::~ReflowPage() {
+    delete _reflowProfile;
+  }
+
+
+  /*
    * Run the reflow page
    */
 
@@ -138,6 +164,7 @@ namespace awreflow {
     drawButtons(flash,GuiButtons,sizeof(GuiButtons)/sizeof(GuiButtons[0]));
     drawTemperatureIcon(flash);
     drawSelection(true);
+    drawProfile(flash);
     drawAxes(flash);
 
     // lights back on
@@ -168,7 +195,7 @@ namespace awreflow {
     // the most efficient way to draw these 2px wide axes is to use the
     // rectangle function
 
-    gl.setForeground(ColourNames::WHITESMOKE);
+    gl.setForeground(ColourNames::GREY70);
 
     // X-axis
 
@@ -196,14 +223,108 @@ namespace awreflow {
 
 
   /*
-   * Plot a fat line (2px wide) using bresenham
+   * Draw the reflow profile
    */
 
-#if 0
-  void wideLine(const Point& p1,const Point& p2,Panel::tCOLOUR cr) {
+  void ReflowPage::drawProfile(Flash& flash) const {
 
+    uint8_t i;
+    uint32_t height,width;
+    Point p1,p2,p;
+    Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
+    AxisNumberWriter writer;
+
+    // starting point
+
+    p1.X=LEFT_MARGIN;
+    p1.Y=360-BOTTOM_MARGIN-1;
+
+    // constants used later
+
+    width=640-LEFT_MARGIN-RIGHT_MARGIN-1;
+    height=360-10-BOTTOM_MARGIN;
+
+    // the segments describe the ending condition, loop for each one
+
+    for(i=0;i<_reflowProfile->getSegmentCount();i++) {
+
+      const ReflowProfile::Segment& s((*_reflowProfile)[i]);
+
+      // calculate the end point and plot the line
+
+      p2.X=LEFT_MARGIN+((width*s.EndingTime)/_reflowProfile->getTotalDuration());
+      p2.Y=360-BOTTOM_MARGIN-1-((height*(s.Temperature-25))/(_reflowProfile->getMaxTemperature()-25));
+
+      wideLine(gl,p1,p2,0x00cd99);
+
+      // plot a horizontal dotted grey line to the Y axis. these plotters are far from optimal
+      // for plotting a straight dotted line but they're sufficient for this light load.
+
+      p=p2;
+      gl.setForeground(ColourNames::GREY40);
+      while(p.X>LEFT_MARGIN) {
+        gl.plotPoint(p);
+        p.X-=2;
+      }
+
+      // plot a vertical line down to the X axis
+
+      p=p2;
+      gl.setForeground(ColourNames::GREY40);
+      while(p.Y<360-BOTTOM_MARGIN-1) {
+        gl.plotPoint(p);
+        p.Y+=2;
+      }
+
+      // draw the temperature on the Y axis
+
+      p.X=10;
+      p.Y=p2.Y;
+      writer.write(flash,p,s.Temperature);
+
+      // draw the time on the X axis
+
+      p.X=p2.X;
+      p.Y=360-BOTTOM_MARGIN+4;
+      writer.write(flash,p,s.EndingTime);
+
+      // starting point is now the ending point
+
+      p1=p2;
+    }
   }
-#endif
+
+
+  /*
+   * Plot a fat line (2px wide)
+   */
+
+  void ReflowPage::wideLine(Panel::LcdPanel& gl,const Point& p1,const Point& p2,Panel::tCOLOUR cr) const {
+
+    // set the line colour
+
+    gl.setForeground(cr);
+
+    // draw the first line
+
+    gl.drawLine(p1,p2);
+
+    // draw an adjacent line that's offset by 1px in the X direction if the line is steeper than
+    // it is flat or in the Y direction if it's flatter than it is tall.
+
+    Point np1(p1),np2(p2);
+
+    if(Abs(p2.X-p1.X)>Abs(p2.Y-p1.Y)) {
+      np1.Y++;
+      np2.Y++;
+    }
+    else {
+      np1.X++;
+      np2.X++;
+    }
+    gl.drawLine(np1,np2);
+  }
+
 
   /*
    * Draw the temperature icon

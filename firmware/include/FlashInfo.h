@@ -7,52 +7,52 @@
 namespace awreflow {
   namespace FlashInfo {
 
-    namespace N0_BLACK { enum { OFFSET=0, LENGTH=176, WIDTH=8, HEIGHT=11 }; }
+    namespace N0_BLACK { enum { OFFSET=0, LENGTH=234, WIDTH=9, HEIGHT=13 }; }
     namespace N0_BLUE { enum { OFFSET=256, LENGTH=630, WIDTH=15, HEIGHT=21 }; }
     namespace N0_GREY { enum { OFFSET=1024, LENGTH=384, WIDTH=12, HEIGHT=16 }; }
     namespace N0_ORANGE_PURPLE { enum { OFFSET=1536, LENGTH=280, WIDTH=10, HEIGHT=14 }; }
     namespace N0_PURPLE { enum { OFFSET=2048, LENGTH=300, WIDTH=10, HEIGHT=15 }; }
-    namespace N1_BLACK { enum { OFFSET=2560, LENGTH=110, WIDTH=5, HEIGHT=11 }; }
+    namespace N1_BLACK { enum { OFFSET=2560, LENGTH=130, WIDTH=5, HEIGHT=13 }; }
     namespace N1_BLUE { enum { OFFSET=2816, LENGTH=420, WIDTH=10, HEIGHT=21 }; }
     namespace N1_GREY { enum { OFFSET=3328, LENGTH=224, WIDTH=7, HEIGHT=16 }; }
     namespace N1_ORANGE_PURPLE { enum { OFFSET=3584, LENGTH=168, WIDTH=6, HEIGHT=14 }; }
     namespace N1_PURPLE { enum { OFFSET=3840, LENGTH=210, WIDTH=7, HEIGHT=15 }; }
-    namespace N2_BLACK { enum { OFFSET=4096, LENGTH=154, WIDTH=7, HEIGHT=11 }; }
+    namespace N2_BLACK { enum { OFFSET=4096, LENGTH=208, WIDTH=8, HEIGHT=13 }; }
     namespace N2_BLUE { enum { OFFSET=4352, LENGTH=630, WIDTH=15, HEIGHT=21 }; }
     namespace N2_GREY { enum { OFFSET=5120, LENGTH=320, WIDTH=10, HEIGHT=16 }; }
     namespace N2_ORANGE_PURPLE { enum { OFFSET=5632, LENGTH=252, WIDTH=9, HEIGHT=14 }; }
     namespace N2_PURPLE { enum { OFFSET=5888, LENGTH=300, WIDTH=10, HEIGHT=15 }; }
-    namespace N3_BLACK { enum { OFFSET=6400, LENGTH=176, WIDTH=8, HEIGHT=11 }; }
+    namespace N3_BLACK { enum { OFFSET=6400, LENGTH=234, WIDTH=9, HEIGHT=13 }; }
     namespace N3_BLUE { enum { OFFSET=6656, LENGTH=588, WIDTH=14, HEIGHT=21 }; }
     namespace N3_GREY { enum { OFFSET=7424, LENGTH=320, WIDTH=10, HEIGHT=16 }; }
     namespace N3_ORANGE_PURPLE { enum { OFFSET=7936, LENGTH=252, WIDTH=9, HEIGHT=14 }; }
     namespace N3_PURPLE { enum { OFFSET=8192, LENGTH=330, WIDTH=11, HEIGHT=15 }; }
-    namespace N4_BLACK { enum { OFFSET=8704, LENGTH=176, WIDTH=8, HEIGHT=11 }; }
+    namespace N4_BLACK { enum { OFFSET=8704, LENGTH=234, WIDTH=9, HEIGHT=13 }; }
     namespace N4_BLUE { enum { OFFSET=8960, LENGTH=672, WIDTH=16, HEIGHT=21 }; }
     namespace N4_GREY { enum { OFFSET=9728, LENGTH=352, WIDTH=11, HEIGHT=16 }; }
     namespace N4_ORANGE_PURPLE { enum { OFFSET=10240, LENGTH=280, WIDTH=10, HEIGHT=14 }; }
     namespace N4_PURPLE { enum { OFFSET=10752, LENGTH=360, WIDTH=12, HEIGHT=15 }; }
-    namespace N5_BLACK { enum { OFFSET=11264, LENGTH=154, WIDTH=7, HEIGHT=11 }; }
+    namespace N5_BLACK { enum { OFFSET=11264, LENGTH=234, WIDTH=9, HEIGHT=13 }; }
     namespace N5_BLUE { enum { OFFSET=11520, LENGTH=588, WIDTH=14, HEIGHT=21 }; }
     namespace N5_GREY { enum { OFFSET=12288, LENGTH=352, WIDTH=11, HEIGHT=16 }; }
     namespace N5_ORANGE_PURPLE { enum { OFFSET=12800, LENGTH=280, WIDTH=10, HEIGHT=14 }; }
     namespace N5_PURPLE { enum { OFFSET=13312, LENGTH=330, WIDTH=11, HEIGHT=15 }; }
-    namespace N6_BLACK { enum { OFFSET=13824, LENGTH=176, WIDTH=8, HEIGHT=11 }; }
+    namespace N6_BLACK { enum { OFFSET=13824, LENGTH=234, WIDTH=9, HEIGHT=13 }; }
     namespace N6_BLUE { enum { OFFSET=14080, LENGTH=630, WIDTH=15, HEIGHT=21 }; }
     namespace N6_GREY { enum { OFFSET=14848, LENGTH=384, WIDTH=12, HEIGHT=16 }; }
     namespace N6_ORANGE_PURPLE { enum { OFFSET=15360, LENGTH=252, WIDTH=9, HEIGHT=14 }; }
     namespace N6_PURPLE { enum { OFFSET=15616, LENGTH=360, WIDTH=12, HEIGHT=15 }; }
-    namespace N7_BLACK { enum { OFFSET=16128, LENGTH=154, WIDTH=7, HEIGHT=11 }; }
+    namespace N7_BLACK { enum { OFFSET=16128, LENGTH=208, WIDTH=8, HEIGHT=13 }; }
     namespace N7_BLUE { enum { OFFSET=16384, LENGTH=588, WIDTH=14, HEIGHT=21 }; }
     namespace N7_GREY { enum { OFFSET=17152, LENGTH=352, WIDTH=11, HEIGHT=16 }; }
     namespace N7_ORANGE_PURPLE { enum { OFFSET=17664, LENGTH=280, WIDTH=10, HEIGHT=14 }; }
     namespace N7_PURPLE { enum { OFFSET=18176, LENGTH=330, WIDTH=11, HEIGHT=15 }; }
-    namespace N8_BLACK { enum { OFFSET=18688, LENGTH=176, WIDTH=8, HEIGHT=11 }; }
+    namespace N8_BLACK { enum { OFFSET=18688, LENGTH=234, WIDTH=9, HEIGHT=13 }; }
     namespace N8_BLUE { enum { OFFSET=18944, LENGTH=672, WIDTH=16, HEIGHT=21 }; }
     namespace N8_GREY { enum { OFFSET=19712, LENGTH=384, WIDTH=12, HEIGHT=16 }; }
     namespace N8_ORANGE_PURPLE { enum { OFFSET=20224, LENGTH=280, WIDTH=10, HEIGHT=14 }; }
     namespace N8_PURPLE { enum { OFFSET=20736, LENGTH=360, WIDTH=12, HEIGHT=15 }; }
-    namespace N9_BLACK { enum { OFFSET=21248, LENGTH=176, WIDTH=8, HEIGHT=11 }; }
+    namespace N9_BLACK { enum { OFFSET=21248, LENGTH=234, WIDTH=9, HEIGHT=13 }; }
     namespace N9_BLUE { enum { OFFSET=21504, LENGTH=630, WIDTH=15, HEIGHT=21 }; }
     namespace N9_GREY { enum { OFFSET=22272, LENGTH=384, WIDTH=12, HEIGHT=16 }; }
     namespace N9_ORANGE_PURPLE { enum { OFFSET=22784, LENGTH=280, WIDTH=10, HEIGHT=14 }; }
