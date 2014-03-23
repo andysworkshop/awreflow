@@ -138,12 +138,85 @@ namespace awreflow {
 
     switch(_selectedButton) {
 
+      case START:
+        startReflow();
+        return false;
+
+      case STOP:
+        stopReflow();
+        return false;
+
       case EXIT:
         return true;
 
       default:
         return false;
     }
+  }
+
+
+  /*
+   * Start the reflow and update the UI
+   */
+
+  void ReflowPage::startReflow() {
+
+    FlashGraphics flash(_panel);
+
+    // enable the "stop" button
+
+    drawButtonCenteredGraphic(flash,GuiButtons[STOP],FlashInfo::STOP::OFFSET);
+
+    // move the selected button to "stop"
+
+    drawSelection(false);
+    _selectedButton=STOP;
+    drawSelection(true);
+
+    // disable the exit and start buttons
+
+    drawButtonCenteredGraphic(flash,GuiButtons[START],FlashInfo::PLAY_DISABLED::OFFSET);
+    drawButtonCenteredGraphic(flash,GuiButtons[EXIT],FlashInfo::EXIT_DISABLED::OFFSET);
+
+    // start the process handler
+
+    _reflow.start();
+
+    // the state is now started
+
+    _mode=COOKING;
+  }
+
+
+  /*
+   * Stop the reflow process
+   */
+
+  void ReflowPage::stopReflow() {
+
+    FlashGraphics flash(_panel);
+
+    // stop the process
+
+    _reflow.stop();
+
+    // enable the "exit" button
+
+    drawButtonCenteredGraphic(flash,GuiButtons[EXIT]);
+
+    // move the selected button to "exit"
+
+    drawSelection(false);
+    _selectedButton=EXIT;
+    drawSelection(true);
+
+    // disable the stop button
+
+    drawButtonCenteredGraphic(flash,GuiButtons[STOP],FlashInfo::STOP_DISABLED::OFFSET);
+
+    // the state is now finished
+
+    _mode=FINISHED;
   }
 
 

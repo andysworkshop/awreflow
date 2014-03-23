@@ -26,8 +26,9 @@ namespace awreflow {
 
     protected:
       void clearBackground();
-      void drawButtons(FlashGraphics& flash,const UiButton *buttons,uint8_t numButtons);
-      void drawButton(FlashGraphics& flash,const UiButton *button);
+      void drawButtons(FlashGraphics& flash,const UiButton *buttons,uint8_t numButtons) const;
+      void drawButton(FlashGraphics& flash,const UiButton& button) const;
+      void drawButtonCenteredGraphic(FlashGraphics& flash,const UiButton& button,uint32_t alternateAddress=0) const;
       void onButtonPressed(ButtonIdentifier id);
       void fadeAndClear();
 

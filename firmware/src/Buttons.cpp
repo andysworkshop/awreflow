@@ -50,9 +50,6 @@ namespace awreflow {
      * The timer will count from 0 to 50 inclusive, raise an Update interrupt and
      * then go backwards back down to 0 where it'll raise another Update interrupt
      * and start again. Each journey from one end to the other takes 5000ms/50=10ms.
-     *
-     * Note that the lowest frequency you can set is 1098 for a 72Mhz timer clock source.
-     * This is because the maximum prescaler value is 65536 (72Mhz/65536 = 1098Hz).
      */
 
     _buttonTimer.setTimeBaseByFrequency(5000,49,TIM_CounterMode_CenterAligned3);

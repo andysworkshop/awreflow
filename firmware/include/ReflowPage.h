@@ -63,6 +63,7 @@ namespace awreflow {
 
       const ReflowParameters& _params;
       ReflowProfile *_reflowProfile;
+      Reflow _reflow;
 
     protected:
       void redrawAll();
@@ -73,6 +74,8 @@ namespace awreflow {
       void drawAxes(FlashGraphics& flash) const;
       void drawProfile(FlashGraphics& flash) const;
       void wideLine(Panel::LcdPanel& gl,const Point& p1,const Point& p2,Panel::tCOLOUR cr) const;
+      void startReflow();
+      void stopReflow();
 
     public:
       ReflowPage(Panel& panel,Buttons& buttons,const ReflowParameters& params);

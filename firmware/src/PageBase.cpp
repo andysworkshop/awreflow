@@ -42,12 +42,12 @@ namespace awreflow {
    * Redraw the buttons
    */
 
-  void PageBase::drawButtons(FlashGraphics& flash,const UiButton *buttons,uint8_t numButtons) {
+  void PageBase::drawButtons(FlashGraphics& flash,const UiButton *buttons,uint8_t numButtons) const {
 
     const UiButton *button;
 
     for(button=buttons;numButtons;numButtons--,button++)
-      drawButton(flash,button);
+      drawButton(flash,*button);
   }
 
 
@@ -55,43 +55,57 @@ namespace awreflow {
    * Draw a single button
    */
 
-  void PageBase::drawButton(FlashGraphics& flash,const UiButton *button) {
+  void PageBase::drawButton(FlashGraphics& flash,const UiButton& button) const {
 
     uint16_t x,y;
     Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
 
     // draw the accent line
 
-    gl.setForeground(button->AccentColour);
-    gl.drawLine(Point(button->X,button->Y),Point(button->X+button->Width-1,button->Y));
+    gl.setForeground(button.AccentColour);
+    gl.drawLine(Point(button.X,button.Y),Point(button.X+button.Width-1,button.Y));
 
     // fill the button rectangle
 
-    Rectangle rc(button->X,button->Y+1,button->Width,button->Height-1);
+    Rectangle rc(button.X,button.Y+1,button.Width,button.Height-1);
 
-    gl.setForeground(button->BackgroundColour);
+    gl.setForeground(button.BackgroundColour);
     gl.fillRectangle(rc);
 
     // draw the graphic, centered
 
-    x=button->X+(button->Width/2)-(button->IconWidth)/2;
-    y=button->Y+(button->Height/2)-(button->IconHeight)/2;
-
-    flash.drawBitmap(
-        Rectangle(x,y,button->IconWidth,button->IconHeight),
-        static_cast<uint32_t>(button->IconFlashAddress),
-        button->IconSize
-      );
+    drawButtonCenteredGraphic(flash,button);
 
     // draw the prompt, bottom right
 
-    x=button->X+button->Width-button->PromptWidth-7;
-    y=button->Y+button->Height-button->PromptHeight-7;
+    x=button.X+button.Width-button.PromptWidth-7;
+    y=button.Y+button.Height-button.PromptHeight-7;
 
     flash.drawBitmap(
-        Rectangle(x,y,button->PromptWidth,button->PromptHeight),
-        static_cast<uint32_t>(button->PromptFlashAddress),
-        button->PromptSize
+        Rectangle(x,y,button.PromptWidth,button.PromptHeight),
+        button.PromptFlashAddress,
+        button.PromptSize
+      );
+  }
+
+
+  /*
+   * Draw the centered graphic on the button
+   */
+
+  void PageBase::drawButtonCenteredGraphic(FlashGraphics& flash,const UiButton& button,uint32_t alternateAddress) const {
+
+    uint16_t x,y;
+
+    x=button.X+(button.Width/2)-(button.IconWidth)/2;
+    y=button.Y+(button.Height/2)-(button.IconHeight)/2;
+
+    // draw the bitmap using either the default or alternate state
+
+    flash.drawBitmap(
+        Rectangle(x,y,button.IconWidth,button.IconHeight),
+        alternateAddress==0 ? button.IconFlashAddress : alternateAddress,
+        button.IconSize
       );
   }
 

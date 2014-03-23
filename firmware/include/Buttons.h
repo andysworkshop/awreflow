@@ -55,9 +55,9 @@ namespace awreflow {
        * Timer used to asynchronously sample the button states
        */
 
-      Timer1<
-        Timer1InternalClockFeature,
-        Timer1InterruptFeature
+      Timer6<
+        Timer6InternalClockFeature,
+        Timer6InterruptFeature
       > _buttonTimer;
 
       /*

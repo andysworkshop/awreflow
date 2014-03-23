@@ -9,104 +9,63 @@
 
 namespace awreflow {
 
+
   /*
-   * Run the application
+   * Constructor
    */
 
-  void Reflow::run() {
+  Reflow::Reflow() {
 
-    // set default pin state
+    /*
+     * Set an up-timer up to tick at 10kHz with an auto-reload value of 99
+     * The timer will count from 0 to 99 inclusive then reset back to 0.
+     * It will take 10ms to do this (100Hz).
+     */
 
-    setDefaultPins();
+    _timer.setTimeBaseByFrequency(10000,99);
 
-    // declare (and construct) the objects that will live throughout the application
+    /*
+     * Initialise the channel 4 output compare value to 99 with the default
+     * action of toggle.
+     */
 
-    Buttons buttons;
-    Panel panel;
+    _timer.initCompare(99);
 
-    // these objects will be created, used and destroyed when they're not required
-    // to ensure we minimise our concurrent use of that precious 8Kb of SRAM
+    /*
+     * Set up for PWM output with an initial duty cycle of zero
+     */
 
-    ControlPage *controlPage;
-    ReflowPage *reflowPage;
-#if 0
-    SplashScreen *splashScreen;
-
-    // show the splash screen
-
-    splashScreen=new SplashScreen;
-    splashScreen->show(panel);
-    delete splashScreen;
-#endif
-
-    // go into a loop showing the control page followed by the reflow page
-
-    for(;;) {
-
-      ReflowParameters params;
-
-      // read the parameters from flash and default them if they're not available
-
-      if(!ReflowParametersStorage::read(params)) {
-        params.P=params.I=params.D=1;
-        params.Leaded=true;
-      }
-
-      // create the options page and run it. it won't return until the user
-      // selects a cooking program and opts to proceed.
-
-      controlPage=new ControlPage(panel,buttons,params);
-      params=controlPage->run();
-      delete controlPage;
-
-      // attempt to store the new parameters in flash
-
-      ReflowParametersStorage::write(params);
-
-      // create the reflow page and run it
-
-      reflowPage=new ReflowPage(panel,buttons,params);
-      reflowPage->run();
-      delete reflowPage;
-    }
+    _timer.initCompareForPwmOutput(0);
   }
 
 
   /*
-   * Set up any pins that need to have their modes set up front
+   * Destructor: ensure the timer is stopped
    */
 
-  void Reflow::setDefaultPins() const {
-
-    // the two SPI NSS pins need to be set up and pulled high
-
-    GpioA<DefaultDigitalOutputFeature<3,4>> pa;
-
-    pa[3].set();
-    pa[4].set();
+  Reflow::~Reflow() {
+    stop();
   }
-}
 
 
-/*
- * Main entry point
- */
+  /*
+   * Start the reflow process
+   */
 
-int main() {
+  void Reflow::start() {
+    _timer.enablePeripheral();
+  }
 
-  // we're using interrupts, initialise NVIC
 
-  Nvic::initialise();
+  /*
+   * Stop the reflow process
+   */
 
-  // initialise the millisecond timer
+  void Reflow::stop() {
 
-  MillisecondTimer::initialise();
+    // switch off the duty cycle and disable the peripheral
 
-  // declare and run the application
-
-  awreflow::Reflow app;
-  app.run();
-
-  // not reached
-  return 0;
+    _timer.setDutyCycle(0);
+    _timer.disablePeripheral();
+  }
 }
