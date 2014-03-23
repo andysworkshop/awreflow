@@ -40,7 +40,7 @@ namespace @double {
       // calculate the control variable
 
       pwm=(_kp*error)+(_ki*_integral)+(_kd*derivative);
-      pwm=Math.Max(Math.Min(255.0,pwm),0.0);
+      pwm=Math.Max(Math.Min(100.0,pwm),0.0);
 
       // save the last error
 
