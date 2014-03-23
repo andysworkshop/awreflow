@@ -52,18 +52,9 @@ namespace awreflow {
         BOTTOM_MARGIN = 30
       };
 
-      /*
-       * Operational constants
-       */
-
-      enum {
-        ROOM_TEMPERATURE = 25
-      };
-
-
       const ReflowParameters& _params;
       ReflowProfile *_reflowProfile;
-      Reflow _reflow;
+      Reflow *_reflow;
 
     protected:
       void redrawAll();

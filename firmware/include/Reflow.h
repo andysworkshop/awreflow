@@ -44,14 +44,28 @@ namespace awreflow {
         Timer14InterruptFeature
       > _perSecondTimer;
 
+      DefaultTemperatureReader _temperatureReader;
+
+      const ReflowProfile& _profile;
+      Pid _pid;
+
+      volatile bool _ticked;                // the per-second timer ticked
+      uint16_t _currentSeconds;             // elapsed seconds counter
+      uint8_t _currentSegment;              // the reflow segment we're currently processing
+      Pid::variable_t _desiredTemperature;  // the current desired temperature
+      Pid::variable_t _currentTemperature;  // the current actual temperature
+      Pid::variable_t _temperatureStep;     // how much to add each second to the desired temperature
+
     protected:
       void onInterrupt(TimerEventType tet,uint8_t /* timerNumber */);
 
     public:
-      Reflow();
+      Reflow(const ReflowProfile& profile,const ReflowParameters& params);
       ~Reflow();
 
       void start();
       void stop();
+
+      bool update();
   };
 }

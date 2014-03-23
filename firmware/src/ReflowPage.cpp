@@ -48,6 +48,10 @@ namespace awreflow {
       _reflowProfile=new LeadedReflowProfile;
     else
       _reflowProfile=new LeadFreeReflowProfile;
+
+    // create the reflow object
+
+    _reflow=new Reflow(*_reflowProfile,params);
   }
 
 
@@ -56,6 +60,7 @@ namespace awreflow {
    */
 
   ReflowPage::~ReflowPage() {
+    delete _reflow;
     delete _reflowProfile;
   }
 
@@ -70,7 +75,21 @@ namespace awreflow {
 
     for(;;) {
 
+      // if we're cooking then the reflow object needs to get updated
+
+      if(_mode==COOKING) {
+
+        // update the reflow controller and stop the process when it's finished or aborted
+
+        if(!_reflow->update())
+          stopReflow();
+      }
+
+      // check if any of the buttons has been pressed
+
       if(_buttonPressed) {
+
+        // take action depending on which button it was
 
         switch(_buttonId) {
 
@@ -180,7 +199,7 @@ namespace awreflow {
 
     // start the process handler
 
-    _reflow.start();
+    _reflow->start();
 
     // the state is now started
 
@@ -198,7 +217,7 @@ namespace awreflow {
 
     // stop the process
 
-    _reflow.stop();
+    _reflow->stop();
 
     // enable the "exit" button
 

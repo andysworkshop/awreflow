@@ -14,7 +14,9 @@ namespace awreflow {
    * Constructor
    */
 
-  Reflow::Reflow() {
+  Reflow::Reflow(const ReflowProfile& profile,const ReflowParameters& params)
+    : _profile(profile),
+      _pid(params.P,params.I,params.D) {
 
     /*
      * Set an up-timer up to tick at 10kHz with an auto-reload value of 99
@@ -63,11 +65,16 @@ namespace awreflow {
 
     _perSecondTimer.clearPendingInterruptsFlag(TIM_IT_Update);
     _perSecondTimer.enableInterrupts(TIM_IT_Update);
+
+    /*
+     * At this point the timers are all configured but not enabled so nothing happens. We'll
+     * enable them when start() gets called in response to the user clicking the start icon.
+     */
   }
 
 
   /*
-   * Destructor: ensure the timer is stopped
+   * Destructor: ensure the timers are stopped
    */
 
   Reflow::~Reflow() {
@@ -80,6 +87,22 @@ namespace awreflow {
    */
 
   void Reflow::start() {
+
+    // algorithm operational parameters. set up to start at the current ambient
+    // temperature with a target of whatever the first segment ends at.
+
+    _currentSeconds=0;
+    _currentSegment=0;
+    _currentTemperature=_temperatureReader.readTemperature().Temperature;
+    _desiredTemperature=_currentTemperature;
+    _temperatureStep=(_profile[0].Temperature-_desiredTemperature)/_profile[0].EndingTime;
+
+    // reset the tick notification
+
+    _ticked=false;
+
+    // enable both the timers, the PWM output on PA11 and the per-second ticker on TIM14.
+
     _relayTimer.enablePeripheral();
     _perSecondTimer.enablePeripheral();
   }
@@ -109,9 +132,69 @@ namespace awreflow {
 
 
   /*
+   * This needs to be called more frequently than 1Hz. It checks to see if the per-second timer has
+   * ticked since the last call and will do the PID update if it has. Returns true if the process should
+   * continue or false if it should stop.
+   */
+
+  bool Reflow::update() {
+
+    // has the timer ticked?
+
+    if(!_ticked)
+      return true;
+
+    // reset the ticked flag
+
+    _ticked=false;
+
+    const ReflowProfile::Segment *s=&_profile[_currentSegment];
+
+    // update seconds and see if we've hit the end
+
+    if(s->EndingTime==_currentSeconds) {
+
+      // we have hit the ending time of the current segment. if this is the last segment
+      // then the whole process has completed
+
+      _currentSegment++;
+      if(_currentSegment==_profile.getSegmentCount())
+        return false;
+
+      // we're in a new segment. set up the parameters for this leg.
+
+      s=&_profile[_currentSegment];
+      _temperatureStep=(s->Temperature-_desiredTemperature)/(s->EndingTime-_currentSeconds);
+    }
+
+    // update seconds and desired temperature
+
+    _currentSeconds++;
+    _desiredTemperature+=_temperatureStep;
+
+    // take a temperature reading and abort if there's a hardware failure
+
+    DefaultTemperatureReader::Result result(_temperatureReader.readTemperature());
+
+    if(result.Status!=DefaultTemperatureReader::Result::NO_ERROR)
+      return false;
+
+    // run the PID algorithm and set the relay PWM value from the output
+
+    uint8_t pwm=_pid.update(_desiredTemperature,_currentTemperature);
+    _relayTimer.setDutyCycle(pwm);
+
+    // continue
+
+    return true;
+  }
+
+
+  /*
    * The per-second interrupt has fired
    */
 
   void Reflow::onInterrupt(TimerEventType /* tet */,uint8_t /* timerNumber */) {
+    _ticked=true;
   }
 }
