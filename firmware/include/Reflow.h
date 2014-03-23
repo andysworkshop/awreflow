@@ -20,20 +20,32 @@ namespace awreflow {
     protected:
 
       /*
-       * The relay output is on PA11. One of PA11's alternate functions is timer1 channel 4 output.
+       * The relay output is on PA11. One of PA11's alternate functions is TIM1 channel 4 output.
        * We'll use that facility to produce a hardware-controlled PWM waveform on PA11.
        */
 
-      typedef Timer1<
+      Timer1<
         Timer1InternalClockFeature,       // the timer clock source is internal
         TimerChannel4Feature,             // we're going to use channel 4
         Timer1GpioFeature<                // we want to output something to GPIO
           TIMER_REMAP_NONE,               // the GPIO output will not be remapped
           TIM1_CH4_OUT                    // we will output channel 4 to GPIO
         >
-      > MyTimer;
+      > _relayTimer;
 
-      MyTimer _timer;
+      /*
+       * We'll sample the temperature and run the PID operations once per second. We want to do all
+       * this asynchronously so lets set up TIM14 to fire a 1Hz interrupt that we'll use to operate
+       * the PID algorithm and make the results available to the ReflowPage.
+       */
+
+      Timer14<
+        Timer14InternalClockFeature,
+        Timer14InterruptFeature
+      > _perSecondTimer;
+
+    protected:
+      void onInterrupt(TimerEventType tet,uint8_t /* timerNumber */);
 
     public:
       Reflow();
@@ -41,6 +53,5 @@ namespace awreflow {
 
       void start();
       void stop();
-      void tick();
   };
 }
