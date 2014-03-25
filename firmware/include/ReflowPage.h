@@ -49,7 +49,10 @@ namespace awreflow {
         TOP_MARGIN    = 10,
         LEFT_MARGIN   = 45,
         RIGHT_MARGIN  = 10+75+20,
-        BOTTOM_MARGIN = 30
+        BOTTOM_MARGIN = 30,
+
+        Y_AXIS_HEIGHT = 360-TOP_MARGIN-BOTTOM_MARGIN,
+        X_AXIS_WIDTH = 640-LEFT_MARGIN-RIGHT_MARGIN
       };
 
       const ReflowParameters& _params;
@@ -67,6 +70,7 @@ namespace awreflow {
       void wideLine(Panel::LcdPanel& gl,const Point& p1,const Point& p2,Panel::tCOLOUR cr) const;
       void startReflow();
       void stopReflow();
+      void plotProgress() const;
 
     public:
       ReflowPage(Panel& panel,Buttons& buttons,const ReflowParameters& params);

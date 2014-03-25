@@ -33,6 +33,7 @@ namespace awreflow {
         >
       > _relayTimer;
 
+
       /*
        * We'll sample the temperature and run the PID operations once per second. We want to do all
        * this asynchronously so lets set up TIM14 to fire a 1Hz interrupt that we'll use to operate
@@ -65,7 +66,27 @@ namespace awreflow {
 
       void start();
       void stop();
-
       bool update();
+
+      uint16_t getCurrentSeconds() const;
+      const Pid::variable_t& getCurrentTemperature() const;
   };
+
+
+  /*
+   * Get the current elapsed seconds
+   */
+
+  inline uint16_t Reflow::getCurrentSeconds() const {
+    return _currentSeconds;
+  }
+
+
+  /*
+   * Get the current temperature
+   */
+
+  inline const Pid::variable_t& Reflow::getCurrentTemperature() const {
+    return _currentTemperature;
+  }
 }

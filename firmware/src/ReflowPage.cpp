@@ -14,8 +14,7 @@ namespace awreflow {
    * Buttons on this page.
    */
 
-  static const UiButton GuiButtons[4]=
-  {
+  static const UiButton GuiButtons[4]= {
     { 555,10,75,96, 0xad63ac, 0x9f489e,
         UiButton::NO_GRAPHIC, 0,0,0,
         UiButton::NO_GRAPHIC, 0,0,0 },
@@ -83,6 +82,10 @@ namespace awreflow {
 
         if(!_reflow->update())
           stopReflow();
+
+        // the cooking is ongoing. we now need to plot the current time vs. temperature
+
+        plotProgress();
       }
 
       // check if any of the buttons has been pressed
@@ -113,6 +116,33 @@ namespace awreflow {
         _buttonPressed=false;
       }
     }
+  }
+
+
+  /*
+   * Plot the progress of the reflow on the chart
+   */
+
+  void ReflowPage::plotProgress() const {
+
+    uint16_t x,y;
+
+    // get the current seconds and temperature
+
+    uint16_t seconds(_reflow->getCurrentSeconds());
+    Pid::variable_t temperature(_reflow->getCurrentTemperature());
+
+    // calculate the point on the chart
+
+    x=LEFT_MARGIN+((seconds*X_AXIS_WIDTH)/_reflowProfile->getTotalDuration());
+    y=BOTTOM_MARGIN-((temperature*Y_AXIS_HEIGHT)/_reflowProfile->getMaxTemperature());
+
+    // plot a 2x2 blob on the display
+
+    Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
+
+    gl.setForeground(ColourNames::RED);
+    gl.fillRectangle(Rectangle(x,y-1,2,2));
   }
 
 
@@ -295,7 +325,7 @@ namespace awreflow {
         Rectangle(
             LEFT_MARGIN,
             360-BOTTOM_MARGIN-1,
-            640-LEFT_MARGIN-RIGHT_MARGIN,
+            X_AXIS_WIDTH,
             2
         )
       );
@@ -307,7 +337,7 @@ namespace awreflow {
             LEFT_MARGIN,
             TOP_MARGIN,
             2,
-            360-10-BOTTOM_MARGIN
+            Y_AXIS_HEIGHT
         )
       );
 
@@ -333,8 +363,8 @@ namespace awreflow {
 
     // constants used later
 
-    width=640-LEFT_MARGIN-RIGHT_MARGIN-1;
-    height=360-10-BOTTOM_MARGIN;
+    width=X_AXIS_WIDTH-1;
+    height=Y_AXIS_HEIGHT;
 
     // the segments describe the ending condition, loop for each one
 
@@ -345,7 +375,7 @@ namespace awreflow {
       // calculate the end point and plot the line
 
       p2.X=LEFT_MARGIN+((width*s.EndingTime)/_reflowProfile->getTotalDuration());
-      p2.Y=360-BOTTOM_MARGIN-1-((height*(s.Temperature-25))/(_reflowProfile->getMaxTemperature()-25));
+      p2.Y=360-BOTTOM_MARGIN-1-((height*s.Temperature)/_reflowProfile->getMaxTemperature());
 
       wideLine(gl,p1,p2,0x00cd99);
 
