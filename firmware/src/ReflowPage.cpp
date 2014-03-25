@@ -129,7 +129,7 @@ namespace awreflow {
 
     // get the current seconds and temperature
 
-    uint16_t seconds(_reflow->getCurrentSeconds());
+    uint32_t seconds(_reflow->getCurrentSeconds());
     Pid::variable_t temperature(_reflow->getCurrentTemperature());
 
     // calculate the point on the chart
