@@ -67,7 +67,7 @@ namespace awreflow {
       // each second, sample the temperature and display it
 
       if(MillisecondTimer::hasTimedOut(start,1000)) {
-        _temperature.redraw(_panel);
+        drawTemperature();
         start=MillisecondTimer::millis();
       }
 
@@ -324,6 +324,29 @@ namespace awreflow {
     // lights back on
 
     _panel.setBacklight(95);
+  }
+
+
+  /*
+   * Redraw the temperature
+   */
+
+  void ControlPage::drawTemperature() {
+
+    uint16_t temperature;
+
+    // the temperature reader cannot exist in the same scope as the flash because they
+    // share the SPI bus. Hence we use it in a sub-scope here.
+
+    {
+      DefaultTemperatureReader reader;
+      temperature=reader.readTemperature().Temperature;
+    }
+
+    // the bus has been released so it's safe to construct the flash object here now
+
+    FlashGraphics flash(_panel);
+    _temperatureWriter.redraw(flash,Point(352,317),temperature);
   }
 
 

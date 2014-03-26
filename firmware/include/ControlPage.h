@@ -29,7 +29,7 @@ namespace awreflow {
 
       bool _leadedChecked;
       bool _captive;
-      TemperatureControlWriter _temperature;
+      TemperatureWriter _temperatureWriter;
       BlueIntegerWriter _p;
       BlueIntegerWriter _i;
       BlueIntegerWriter _d;
@@ -40,6 +40,7 @@ namespace awreflow {
       void drawSelection(bool draw) const;
       void drawCheck(FlashGraphics& flash) const;
       void drawCheck(FlashGraphics& flash,uint8_t selbtn,uint32_t offset,uint32_t length,Panel::tCOLOUR colour,uint8_t deselbtn) const;
+      void drawTemperature();
       void handleRight();
       void handleLeft();
       bool handleOk();
@@ -60,6 +61,7 @@ namespace awreflow {
       _selectedButton(REFLOW),
       _leadedChecked(params.Leaded),
       _captive(false),
+      _temperatureWriter(0x7a828c,GreyDigits,16),
       _p(params.P,0,999,Point(500,85)),
       _i(params.I,0,999,Point(500,182)),
       _d(params.D,0,999,Point(500,280)) {

@@ -41,7 +41,9 @@ namespace awreflow {
     : PageBase(panel,buttons),
       _selectedButton(START),
       _mode(WAITING),
-      _params(params) {
+      _params(params),
+      _currentTemperatureWriter(0x9f489e,PurpleDigits,15),
+      _desiredTemperatureWriter(0x9f489e,OrangePurpleDigits,15) {
 
     if(params.Leaded)
       _reflowProfile=new LeadedReflowProfile;
@@ -165,56 +167,6 @@ namespace awreflow {
 
     gl.setForeground(ColourNames::RED);
     gl.fillRectangle(Rectangle(x,y-1,2,2));
-  }
-
-
-  /*
-   * Redraw the temperature indicator button to reflect current state. When not cooking
-   * we'll show the current oven temperature. When cooking we'll show both the current
-   * oven temperature and the target temperature.
-   */
-
-  void ReflowPage::drawTemperatureButton() const {
-
-    uint16_t temperature;
-
-    // always display the current oven temperature
-
-    if(_mode==COOKING)
-      temperature=_reflow->getCurrentTemperature();   // temperature should reflect last used for PID
-    else {
-
-      // get a new temperature reading
-
-      DefaultTemperatureReader dtr;
-      temperature=dtr.readTemperature().Temperature;
-    }
-
-    // display the current temperature
-
-    FlashGraphics flash(_panel);
-    PurpleIntegerWriter ptw;
-
-    ptw.redraw(flash,Point(0,0),temperature);
-
-    // either display the desired temperature or blank out that part of the button
-
-    if(_mode==COOKING) {
-
-      temperature=_reflow->getDesiredTemperature();
-
-      OrangePurpleIntegerWriter opw;
-      opw.redraw(flash,Point(0,0),temperature);
-    }
-    else {
-
-      // not cooking, blank out that part of the purple button
-
-      Panel::LcdPanel gl(_panel.getGraphicsLibrary());
-
-      gl.setForeground(0x9f489e);
-      gl.fillRectangle(Rectangle(0,0,1,1));
-    }
   }
 
 
@@ -550,5 +502,51 @@ namespace awreflow {
     _gl.drawRectangle(
         Rectangle(button.X-5,button.Y-5,button.Width+10,button.Height+10)
       );
+  }
+
+
+  /*
+   * Redraw the temperature indicator button to reflect current state. When not cooking
+   * we'll show the current oven temperature. When cooking we'll show both the current
+   * oven temperature and the target temperature.
+   */
+
+  void ReflowPage::drawTemperatureButton() {
+
+    uint16_t temperature;
+
+    // always display the current oven temperature
+
+    if(_mode==COOKING)
+      temperature=_reflow->getCurrentTemperature();   // temperature should reflect last used for PID
+    else {
+
+      // get a new temperature reading
+
+      DefaultTemperatureReader dtr;
+      temperature=dtr.readTemperature().Temperature;
+    }
+
+    // display the current temperature
+
+    FlashGraphics flash(_panel);
+    _currentTemperatureWriter.redraw(flash,Point(570,56),temperature);
+
+    // either display the desired temperature or blank out that part of the button
+
+    if(_mode==COOKING) {
+
+      temperature=_reflow->getDesiredTemperature();
+      _desiredTemperatureWriter.redraw(flash,Point(570,82),temperature);
+    }
+    else {
+
+      // not cooking, blank out that part of the purple button
+
+      Panel::LcdPanel gl(_panel.getGraphicsLibrary());
+
+      gl.setForeground(0x9f489e);
+      gl.fillRectangle(Rectangle(565,76,62,22));
+    }
   }
 }

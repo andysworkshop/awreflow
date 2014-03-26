@@ -58,6 +58,8 @@ namespace awreflow {
       const ReflowParameters& _params;
       ReflowProfile *_reflowProfile;
       Reflow *_reflow;
+      TemperatureWriter _currentTemperatureWriter;
+      TemperatureWriter _desiredTemperatureWriter;
 
     protected:
       void redrawAll();
@@ -71,7 +73,7 @@ namespace awreflow {
       void startReflow();
       void stopReflow();
       void plotProgress() const;
-      void drawTemperatureButton() const;
+      void drawTemperatureButton();
 
     public:
       ReflowPage(Panel& panel,Buttons& buttons,const ReflowParameters& params);
