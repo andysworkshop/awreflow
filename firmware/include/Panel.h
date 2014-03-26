@@ -27,6 +27,11 @@ namespace awreflow {
         Pin_RS       = GPIO_Pin_2
       };
 
+      enum {
+        HEIGHT = LcdPanel::SHORT_SIDE,
+        WIDTH = LcdPanel::LONG_SIDE
+      };
+
       // declare the access mode carefully so that we pick up the optimised implementation
 
       typedef LcdPanel::tCOLOUR tCOLOUR;

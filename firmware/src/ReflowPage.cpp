@@ -144,33 +144,6 @@ namespace awreflow {
 
 
   /*
-   * Plot the progress of the reflow on the chart
-   */
-
-  void ReflowPage::plotProgress() const {
-
-    uint16_t x,y;
-
-    // get the current seconds and temperature
-
-    uint32_t seconds(_reflow->getCurrentSeconds());
-    Pid::variable_t temperature(_reflow->getCurrentTemperature());
-
-    // calculate the point on the chart
-
-    x=LEFT_MARGIN+((seconds*X_AXIS_WIDTH)/_reflowProfile->getTotalDuration());
-    y=BOTTOM_MARGIN-((temperature*Y_AXIS_HEIGHT)/_reflowProfile->getMaxTemperature());
-
-    // plot a 2x2 blob on the display
-
-    Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
-
-    gl.setForeground(ColourNames::RED);
-    gl.fillRectangle(Rectangle(x,y-1,2,2));
-  }
-
-
-  /*
    * Left/right button pressed: navigate
    */
 
@@ -348,7 +321,7 @@ namespace awreflow {
     gl.fillRectangle(
         Rectangle(
             LEFT_MARGIN,
-            360-BOTTOM_MARGIN-1,
+            Panel::HEIGHT-BOTTOM_MARGIN-1,
             X_AXIS_WIDTH,
             2
         )
@@ -375,20 +348,19 @@ namespace awreflow {
   void ReflowPage::drawProfile(FlashGraphics& flash) const {
 
     uint8_t i;
-    uint32_t height,width;
     Point p1,p2,p;
     Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
     AxisNumberWriter writer;
 
-    // starting point
-
-    p1.X=LEFT_MARGIN;
-    p1.Y=360-BOTTOM_MARGIN-1;
-
     // constants used later
 
-    width=X_AXIS_WIDTH-1;
-    height=Y_AXIS_HEIGHT;
+    const uint32_t width=X_AXIS_WIDTH-1;
+    const uint32_t height=Y_AXIS_HEIGHT;
+
+    // starting point (all the reflow profiles have a desired start of 25C)
+
+    p1.X=LEFT_MARGIN;
+    p1.Y=Panel::HEIGHT-BOTTOM_MARGIN-1-((height*25)/_reflowProfile->getMaxTemperature());;
 
     // the segments describe the ending condition, loop for each one
 
@@ -399,7 +371,7 @@ namespace awreflow {
       // calculate the end point and plot the line
 
       p2.X=LEFT_MARGIN+((width*s.EndingTime)/_reflowProfile->getTotalDuration());
-      p2.Y=360-BOTTOM_MARGIN-1-((height*s.Temperature)/_reflowProfile->getMaxTemperature());
+      p2.Y=Panel::HEIGHT-BOTTOM_MARGIN-1-((height*s.Temperature)/_reflowProfile->getMaxTemperature());
 
       wideLine(gl,p1,p2,0x00cd99);
 
@@ -417,7 +389,7 @@ namespace awreflow {
 
       p=p2;
       gl.setForeground(ColourNames::GREY40);
-      while(p.Y<360-BOTTOM_MARGIN-1) {
+      while(p.Y<Panel::HEIGHT-BOTTOM_MARGIN-1) {
         gl.plotPoint(p);
         p.Y+=2;
       }
@@ -431,13 +403,40 @@ namespace awreflow {
       // draw the time on the X axis
 
       p.X=p2.X;
-      p.Y=360-BOTTOM_MARGIN+4;
+      p.Y=Panel::HEIGHT-BOTTOM_MARGIN+4;
       writer.write(flash,p,s.EndingTime);
 
       // starting point is now the ending point
 
       p1=p2;
     }
+  }
+
+
+  /*
+   * Plot the progress of the reflow on the chart
+   */
+
+  void ReflowPage::plotProgress() const {
+
+    uint16_t x,y;
+
+    // get the current seconds and temperature
+
+    uint32_t seconds(_reflow->getCurrentSeconds());
+    Pid::variable_t temperature(_reflow->getCurrentTemperature());
+
+    // calculate the point on the chart
+
+    x=LEFT_MARGIN+((seconds*X_AXIS_WIDTH)/_reflowProfile->getTotalDuration());
+    y=Panel::HEIGHT-BOTTOM_MARGIN-((temperature*Y_AXIS_HEIGHT)/_reflowProfile->getMaxTemperature());
+
+    // plot a 2x2 blob on the display
+
+    Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
+
+    gl.setForeground(ColourNames::RED);
+    gl.fillRectangle(Rectangle(x,y-1,2,2));
   }
 
 

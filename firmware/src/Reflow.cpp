@@ -94,7 +94,7 @@ namespace awreflow {
     _currentSeconds=0;
     _currentSegment=0;
     _currentTemperature=_temperatureReader.readTemperature().Temperature;
-    _desiredTemperature=_currentTemperature;
+    _desiredTemperature=25;       // all profiles start at 25
     _temperatureStep=(_profile[0].Temperature-_desiredTemperature)/_profile[0].EndingTime;
 
     // reset the tick notification
@@ -178,6 +178,9 @@ namespace awreflow {
 
     if(result.Status!=DefaultTemperatureReader::Result::NO_ERROR)
       return STOP;
+
+//    _currentTemperature=result.Temperature;
+    _currentTemperature=_desiredTemperature;
 
     // run the PID algorithm and set the relay PWM value from the output
 
