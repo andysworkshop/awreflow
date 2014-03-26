@@ -71,6 +71,7 @@ namespace awreflow {
       void startReflow();
       void stopReflow();
       void plotProgress() const;
+      void drawTemperatureButton() const;
 
     public:
       ReflowPage(Panel& panel,Buttons& buttons,const ReflowParameters& params);

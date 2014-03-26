@@ -17,6 +17,18 @@ namespace awreflow {
 
   class Reflow {
 
+    public:
+
+      /*
+       * Actions that can happen as a result of the update() call.
+       */
+
+      enum UpdateResult {
+        NOTHING,
+        UPDATED,
+        STOP
+      };
+
     protected:
 
       /*
@@ -66,10 +78,11 @@ namespace awreflow {
 
       void start();
       void stop();
-      bool update();
+      UpdateResult update();
 
       uint16_t getCurrentSeconds() const;
       const Pid::variable_t& getCurrentTemperature() const;
+      const Pid::variable_t& getDesiredTemperature() const;
   };
 
 
@@ -88,5 +101,14 @@ namespace awreflow {
 
   inline const Pid::variable_t& Reflow::getCurrentTemperature() const {
     return _currentTemperature;
+  }
+
+
+  /*
+   * Get the desired temperature
+   */
+
+  inline const Pid::variable_t& Reflow::getDesiredTemperature() const {
+    return _desiredTemperature;
   }
 }

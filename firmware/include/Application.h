@@ -42,6 +42,8 @@ using namespace stm32plus::display;
 #include "TemperatureControlWriter.h"
 #include "AxisNumberWriter.h"
 #include "BlueIntegerWriter.h"
+#include "PurpleIntegerWriter.h"
+#include "OrangePurpleIntegerWriter.h"
 #include "ReflowParameters.h"
 #include "ReflowParametersStorage.h"
 #include "Pid.h"

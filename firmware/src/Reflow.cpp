@@ -137,12 +137,12 @@ namespace awreflow {
    * continue or false if it should stop.
    */
 
-  bool Reflow::update() {
+  Reflow::UpdateResult Reflow::update() {
 
     // has the timer ticked?
 
     if(!_ticked)
-      return true;
+      return NOTHING;
 
     // reset the ticked flag
 
@@ -159,7 +159,7 @@ namespace awreflow {
 
       _currentSegment++;
       if(_currentSegment==_profile.getSegmentCount())
-        return false;
+        return STOP;
 
       // we're in a new segment. set up the parameters for this leg.
 
@@ -177,7 +177,7 @@ namespace awreflow {
     DefaultTemperatureReader::Result result(_temperatureReader.readTemperature());
 
     if(result.Status!=DefaultTemperatureReader::Result::NO_ERROR)
-      return false;
+      return STOP;
 
     // run the PID algorithm and set the relay PWM value from the output
 
@@ -186,7 +186,7 @@ namespace awreflow {
 
     // continue
 
-    return true;
+    return UPDATED;
   }
 
 

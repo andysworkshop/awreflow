@@ -70,7 +70,15 @@ namespace awreflow {
 
   void ReflowPage::run() {
 
+    uint32_t start;
+
+    // start off with a full page redraw
+
     redrawAll();
+
+    // go into a keypress/timeout event loop
+
+    start=MillisecondTimer::millis();
 
     for(;;) {
 
@@ -80,12 +88,26 @@ namespace awreflow {
 
         // update the reflow controller and stop the process when it's finished or aborted
 
-        if(!_reflow->update())
-          stopReflow();
+        switch(_reflow->update()) {
 
-        // the cooking is ongoing. we now need to plot the current time vs. temperature
+          case Reflow::STOP:
+            stopReflow();
+            break;
 
-        plotProgress();
+          case Reflow::UPDATED:
+            plotProgress();
+            break;
+
+          default:
+            break;
+        }
+      }
+
+      // each second, sample the temperature and display it
+
+      if(MillisecondTimer::hasTimedOut(start,1000)) {
+        drawTemperatureButton();
+        start=MillisecondTimer::millis();
       }
 
       // check if any of the buttons has been pressed
@@ -143,6 +165,56 @@ namespace awreflow {
 
     gl.setForeground(ColourNames::RED);
     gl.fillRectangle(Rectangle(x,y-1,2,2));
+  }
+
+
+  /*
+   * Redraw the temperature indicator button to reflect current state. When not cooking
+   * we'll show the current oven temperature. When cooking we'll show both the current
+   * oven temperature and the target temperature.
+   */
+
+  void ReflowPage::drawTemperatureButton() const {
+
+    uint16_t temperature;
+
+    // always display the current oven temperature
+
+    if(_mode==COOKING)
+      temperature=_reflow->getCurrentTemperature();   // temperature should reflect last used for PID
+    else {
+
+      // get a new temperature reading
+
+      DefaultTemperatureReader dtr;
+      temperature=dtr.readTemperature().Temperature;
+    }
+
+    // display the current temperature
+
+    FlashGraphics flash(_panel);
+    PurpleIntegerWriter ptw;
+
+    ptw.redraw(flash,Point(0,0),temperature);
+
+    // either display the desired temperature or blank out that part of the button
+
+    if(_mode==COOKING) {
+
+      temperature=_reflow->getDesiredTemperature();
+
+      OrangePurpleIntegerWriter opw;
+      opw.redraw(flash,Point(0,0),temperature);
+    }
+    else {
+
+      // not cooking, blank out that part of the purple button
+
+      Panel::LcdPanel gl(_panel.getGraphicsLibrary());
+
+      gl.setForeground(0x9f489e);
+      gl.fillRectangle(Rectangle(0,0,1,1));
+    }
   }
 
 
