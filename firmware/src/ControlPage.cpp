@@ -333,20 +333,20 @@ namespace awreflow {
 
   void ControlPage::drawTemperature() {
 
-    uint16_t temperature;
+    DefaultTemperatureReader::Result result;
 
     // the temperature reader cannot exist in the same scope as the flash because they
     // share the SPI bus. Hence we use it in a sub-scope here.
 
     {
       DefaultTemperatureReader reader;
-      temperature=reader.readTemperature().Temperature;
+      result=reader.readTemperature();
     }
 
     // the bus has been released so it's safe to construct the flash object here now
 
     FlashGraphics flash(_panel);
-    _temperatureWriter.redraw(flash,Point(352,317),temperature);
+    _temperatureWriter.redraw(flash,Point(352,317),result);
   }
 
 

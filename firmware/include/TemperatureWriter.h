@@ -12,7 +12,9 @@ namespace awreflow {
 
 
   /**
-   * Derivation of the integer number writer for a temperature display.
+   * Derivation of the integer number writer for a temperature display. The number
+   * digits array contains the digits 0..9 in the respective array positions. The degrees-C
+   * symbol is at position 10 and the "broken" symbol is at position 11.
    */
 
   class TemperatureWriter : public IntegerNumberWriter {
@@ -20,9 +22,18 @@ namespace awreflow {
     protected:
       uint16_t _lastWidth;
 
+      /*
+       * Positions in the digits array
+       */
+
+      enum {
+        DEGREES_C = 10,
+        BROKEN = 11
+      };
+
     public:
       TemperatureWriter(Panel::tCOLOUR bg,const NumberWriter::Digit *digits,uint8_t height);
 
-      void redraw(FlashGraphics& flash,const Point& p,uint32_t value);
+      void redraw(FlashGraphics& flash,const Point& p,const DefaultTemperatureReader::Result& result);
   };
 }

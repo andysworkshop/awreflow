@@ -25,23 +25,37 @@ namespace awreflow {
    * Redraw the control
    */
 
-  void TemperatureWriter::redraw(FlashGraphics& flash,const Point& p,uint32_t value) {
+  void TemperatureWriter::redraw(FlashGraphics& flash,const Point& p,const DefaultTemperatureReader::Result& result) {
 
     uint16_t width;
 
-    // write the number
+    if(result.Status==DefaultTemperatureReader::Result::NO_ERROR) {
 
-    IntegerNumberWriter::write(flash,p,value);
-    width=IntegerNumberWriter::write(flash,p,value);
+      // write the number
 
-    // write the degrees C symbol
+      width=IntegerNumberWriter::write(flash,p,result.Temperature);
 
-    flash.drawBitmap(
-        Rectangle(p.X+width,p.Y,_digits[10].Width,_height),
-        _digits[10].FlashAddress,
-        _digits[10].Length);
+      // write the degrees C symbol
 
-    width+=_digits[10].Width;
+      flash.drawBitmap(
+          Rectangle(p.X+width,p.Y,_digits[DEGREES_C].Width,_height),
+          _digits[DEGREES_C].FlashAddress,
+          _digits[DEGREES_C].Length);
+
+      width+=_digits[DEGREES_C].Width;
+
+    }
+    else {
+
+      // there's something wrong with the comms, show a "broken" icon
+
+      flash.drawBitmap(
+          Rectangle(p.X,p.Y,_digits[BROKEN].Width,_height),
+          _digits[BROKEN].FlashAddress,
+          _digits[BROKEN].Length);
+
+      width=_digits[BROKEN].Width;
+    }
 
     // erase any background overhang from last time
 

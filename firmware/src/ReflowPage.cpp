@@ -512,31 +512,40 @@ namespace awreflow {
 
   void ReflowPage::drawTemperatureButton() {
 
-    uint16_t temperature;
+    DefaultTemperatureReader::Result result;
 
     // always display the current oven temperature
 
-    if(_mode==COOKING)
-      temperature=_reflow->getCurrentTemperature();   // temperature should reflect last used for PID
+    if(_mode==COOKING) {
+
+      // temperature should reflect last used for PID - in any case we can only have one of
+      // the per-second updates sampling the temperature because of the speed limitations of
+      // the AD converter
+
+      result.Temperature=_reflow->getCurrentTemperature();
+      result.Status=DefaultTemperatureReader::Result::NO_ERROR;
+    }
     else {
 
       // get a new temperature reading
 
       DefaultTemperatureReader dtr;
-      temperature=dtr.readTemperature().Temperature;
+      result=dtr.readTemperature();
     }
 
     // display the current temperature
 
     FlashGraphics flash(_panel);
-    _currentTemperatureWriter.redraw(flash,Point(570,56),temperature);
+    _currentTemperatureWriter.redraw(flash,Point(570,56),result);
 
     // either display the desired temperature or blank out that part of the button
 
     if(_mode==COOKING) {
 
-      temperature=_reflow->getDesiredTemperature();
-      _desiredTemperatureWriter.redraw(flash,Point(570,82),temperature);
+      result.Temperature=_reflow->getDesiredTemperature();
+      result.Status=DefaultTemperatureReader::Result::NO_ERROR;
+
+      _desiredTemperatureWriter.redraw(flash,Point(570,82),result);
     }
     else {
 
