@@ -46,31 +46,17 @@ namespace awreflow {
       > _relayTimer;
 
 
-      /*
-       * We'll sample the temperature and run the PID operations once per second. We want to do all
-       * this asynchronously so lets set up TIM14 to fire a 1Hz interrupt that we'll use to operate
-       * the PID algorithm and make the results available to the ReflowPage.
-       */
-
-      Timer14<
-        Timer14InternalClockFeature,
-        Timer14InterruptFeature
-      > _perSecondTimer;
-
       DefaultTemperatureReader _temperatureReader;
 
       const ReflowProfile& _profile;
       Pid _pid;
 
-      volatile bool _ticked;                // the per-second timer ticked
+      uint32_t _lastTick;                   // the last millisecond timer value
       uint16_t _currentSeconds;             // elapsed seconds counter
       uint8_t _currentSegment;              // the reflow segment we're currently processing
       Pid::variable_t _desiredTemperature;  // the current desired temperature
       Pid::variable_t _currentTemperature;  // the current actual temperature
       Pid::variable_t _temperatureStep;     // how much to add each second to the desired temperature
-
-    protected:
-      void onInterrupt(TimerEventType tet,uint8_t /* timerNumber */);
 
     public:
       Reflow(const ReflowProfile& profile,const ReflowParameters& params);

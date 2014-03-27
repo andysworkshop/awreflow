@@ -38,38 +38,6 @@ namespace awreflow {
      */
 
     _relayTimer.initCompareForPwmOutput(0);
-
-    /*
-     * Set ourselves up as an observer for interrupts raised by the timer class.
-     */
-
-    _perSecondTimer.TimerInterruptEventSender.insertSubscriber(
-        TimerInterruptEventSourceSlot::bind(this,&Reflow::onInterrupt)
-      );
-
-    /*
-     * Set an up-down-timer up to tick at 5000Hz with an auto-reload value of 4999
-     * The timer will count from 0 to 4999 inclusive, raise an Update interrupt and
-     * then go backwards back down to 0 where it'll raise another Update interrupt
-     * and start again. Each journey from one end to the other takes 1 second.
-     *
-     * Note that the lowest frequency you can set is 1098 for a 72Mhz timer clock source.
-     * This is because the maximum prescaler value is 65536 (72Mhz/65536 = 1098Hz).
-     */
-
-    _perSecondTimer.setTimeBaseByFrequency(5000,4999,TIM_CounterMode_CenterAligned3);
-
-    /*
-     * Enable just the Update interrupt after ensuring that it won't fire immediately
-     */
-
-    _perSecondTimer.clearPendingInterruptsFlag(TIM_IT_Update);
-    _perSecondTimer.enableInterrupts(TIM_IT_Update);
-
-    /*
-     * At this point the timers are all configured but not enabled so nothing happens. We'll
-     * enable them when start() gets called in response to the user clicking the start icon.
-     */
   }
 
 
@@ -97,14 +65,13 @@ namespace awreflow {
     _desiredTemperature=25;       // all profiles start at 25
     _temperatureStep=(_profile[0].Temperature-_desiredTemperature)/_profile[0].EndingTime;
 
-    // reset the tick notification
+    // reset the last tick value
 
-    _ticked=false;
+    _lastTick=MillisecondTimer::millis();
 
-    // enable both the timers, the PWM output on PA11 and the per-second ticker on TIM14.
+    // enable the timer for the PWM output on PA11
 
     _relayTimer.enablePeripheral();
-    _perSecondTimer.enablePeripheral();
   }
 
 
@@ -114,16 +81,6 @@ namespace awreflow {
 
   void Reflow::stop() {
 
-    // unsubscribe from tick events
-
-    _perSecondTimer.TimerInterruptEventSender.removeSubscriber(
-        TimerInterruptEventSourceSlot::bind(this,&Reflow::onInterrupt)
-    );
-
-    // disable the ticker
-
-    _perSecondTimer.disablePeripheral();
-
     // switch off the duty cycle and disable the peripheral
 
     _relayTimer.setDutyCycle(0);
@@ -132,21 +89,23 @@ namespace awreflow {
 
 
   /*
-   * This needs to be called more frequently than 1Hz. It checks to see if the per-second timer has
-   * ticked since the last call and will do the PID update if it has. Returns true if the process should
-   * continue or false if it should stop.
+   * This needs to be called more frequently than 1Hz. It checks to see if one second has
+   * passed since the last call and will do the PID update if it has. Returns an UpdateResult
+   * value that declares what's been done.
    */
 
   Reflow::UpdateResult Reflow::update() {
 
-    // has the timer ticked?
+    // has a second elapsed since we were here last?
 
-    if(!_ticked)
+    if(!MillisecondTimer::hasTimedOut(_lastTick,1000))
       return NOTHING;
 
-    // reset the ticked flag
+    // reset for the next update (now, not after we've burned some cycles doing our update)
 
-    _ticked=false;
+    _lastTick=MillisecondTimer::millis();
+
+    // get a pointer to the current segment
 
     const ReflowProfile::Segment *s=&_profile[_currentSegment];
 
@@ -190,14 +149,5 @@ namespace awreflow {
     // continue
 
     return UPDATED;
-  }
-
-
-  /*
-   * The per-second interrupt has fired
-   */
-
-  void Reflow::onInterrupt(TimerEventType /* tet */,uint8_t /* timerNumber */) {
-    _ticked=true;
   }
 }
