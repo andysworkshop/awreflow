@@ -224,6 +224,10 @@ namespace awreflow {
     drawButtonCenteredGraphic(flash,GuiButtons[START],FlashInfo::PLAY_DISABLED::OFFSET);
     drawButtonCenteredGraphic(flash,GuiButtons[EXIT],FlashInfo::EXIT_DISABLED::OFFSET);
 
+    // reset point plotting
+
+    _lastPlottedPoint=Point::Origin;
+
     // start the process handler
 
     _reflow->start();
@@ -417,9 +421,9 @@ namespace awreflow {
    * Plot the progress of the reflow on the chart
    */
 
-  void ReflowPage::plotProgress() const {
+  void ReflowPage::plotProgress() {
 
-    uint16_t x,y;
+    Point p2;
 
     // get the current seconds and temperature
 
@@ -428,15 +432,16 @@ namespace awreflow {
 
     // calculate the point on the chart
 
-    x=LEFT_MARGIN+((seconds*X_AXIS_WIDTH)/_reflowProfile->getTotalDuration());
-    y=Panel::HEIGHT-BOTTOM_MARGIN-((temperature*Y_AXIS_HEIGHT)/_reflowProfile->getMaxTemperature());
+    p2.X=LEFT_MARGIN+((seconds*X_AXIS_WIDTH)/_reflowProfile->getTotalDuration());
+    p2.Y=Panel::HEIGHT-BOTTOM_MARGIN-((temperature*Y_AXIS_HEIGHT)/_reflowProfile->getMaxTemperature());
 
-    // plot a 2x2 blob on the display
+    if(_lastPlottedPoint!=Point::Origin) {
 
-    Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
+      Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
+      wideLine(gl,_lastPlottedPoint,p2,ColourNames::RED);
+    }
 
-    gl.setForeground(ColourNames::RED);
-    gl.fillRectangle(Rectangle(x,y-1,2,2));
+    _lastPlottedPoint=p2;
   }
 
 

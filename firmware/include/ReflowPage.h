@@ -60,6 +60,7 @@ namespace awreflow {
       Reflow *_reflow;
       TemperatureWriter _currentTemperatureWriter;
       TemperatureWriter _desiredTemperatureWriter;
+      Point _lastPlottedPoint;
 
     protected:
       void redrawAll();
@@ -72,7 +73,7 @@ namespace awreflow {
       void wideLine(Panel::LcdPanel& gl,const Point& p1,const Point& p2,Panel::tCOLOUR cr) const;
       void startReflow();
       void stopReflow();
-      void plotProgress() const;
+      void plotProgress();
       void drawTemperatureButton();
 
     public:
