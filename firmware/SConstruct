@@ -1,0 +1,107 @@
+#
+# Build script for Andy's Workshop Reflow Controller (awreflow)
+#
+
+# This is the install directory for stm32plus. You need to set this correctly
+
+STM32PLUS_INSTALL_DIR = "/usr/lib/stm32plus"
+STM32PLUS_SRC_DIR = "c:/cygwin/home/Andy/src/stm32plus"
+STM32PLUS_VERSION = "030200"
+
+# main build script
+
+import os
+import os.path
+
+def usage():
+
+        print """
+Usage: scons mode=<MODE>
+
+  <MODE>: debug/fast/small.
+    debug = -O0
+    fast  = -O3
+    small = -Os
+
+  Examples using -j to do a 4-job parallel build:
+    scons mode=debug -j4
+    scons mode=fast -j4
+    scons mode=small -j4
+"""
+
+# set up build environment and pull in OS environment variables
+
+env=Environment(ENV=os.environ)
+
+# mode argument must be supplied
+
+mode=ARGUMENTS.get('mode')
+
+if not (mode in ['debug', 'fast', 'small']):
+	usage()
+	Exit(1)
+
+# verify that stm32plus is installed in the defined location
+
+stm32plus_file=STM32PLUS_INSTALL_DIR+"/"+STM32PLUS_VERSION+"/libstm32plus-"+STM32PLUS_VERSION+"-f051-"+mode+".a"
+if not os.path.isfile(stm32plus_file):
+	print stm32plus_file+" does not exist."
+	print "Please edit SConstruct and check the STM32PLUS_INSTALL_DIR and STM32PLUS_VERSION variables."
+	Exit(1)
+
+# replace the compiler values in the environment
+
+env.Replace(CC="arm-none-eabi-gcc")
+env.Replace(CXX="arm-none-eabi-g++")
+env.Replace(AS="arm-none-eabi-as")
+
+# create the C and C++ flags that are needed. We can't use the extra or pedantic errors on the ST library code.
+
+env.Replace(CCFLAGS=["-Wall","-Werror","-ffunction-sections","-fdata-sections","-fno-exceptions","-mthumb","-gdwarf-2","-pipe","-mcpu=cortex-m0","-DSTM32PLUS_F0_51","-DHSE_VALUE=8000000"])
+env.Replace(CXXFLAGS=["-Wextra","-pedantic-errors","-fno-rtti","-std=gnu++0x","-fno-threadsafe-statics"])
+env.Append(LINKFLAGS=["-Xlinker","--gc-sections","-mthumb","-g3","-gdwarf-2"])
+env.Append(ASFLAGS="-mcpu=cortex-m0")
+env.Append(LINKFLAGS=["-mcpu=cortex-m0","-L"+STM32PLUS_INSTALL_DIR+"/"+STM32PLUS_VERSION,"-lstm32plus-"+STM32PLUS_VERSION+"-f051-small"])
+
+# set the include directories
+
+#env.Append(CPPPATH=["#lib/include","#lib/include/stl","#lib"])
+env.Append(CPPPATH=["include",STM32PLUS_SRC_DIR+"/lib/include",STM32PLUS_SRC_DIR+"/lib/include/stl",STM32PLUS_SRC_DIR+"/lib"])
+
+# collect the source files
+
+matches=[]
+matches.append(Glob("src/*.cpp"))
+matches.append(Glob("system/LibraryHacks.cpp"))
+
+# append the system startup files
+
+matches.append("system/LibraryHacks.cpp")
+matches.append("system/f051/Startup.asm")
+matches.append("system/f051/System.c")
+
+# here's where the linker script is located
+
+linkerscript="system/f051/Linker.ld"
+
+# add on the mode=specific optimisation definitions
+
+if mode=="debug":
+        env.Append(CCFLAGS=["-O0","-g3"])
+elif mode=="fast":
+        env.Append(CCFLAGS=["-O3"])
+elif mode=="small":
+        env.Append(CCFLAGS=["-Os"])
+
+# set up the output directory
+
+buildoutdir="build/"+mode
+
+# trigger a build with the correct output name
+
+elf=env.Program("awreflow.elf",matches)
+hex=env.Command("awreflow.hex",elf,"arm-none-eabi-objcopy -O ihex "+buildoutdir+"/awreflow.elf "+buildoutdir+"/awreflow.hex")
+bin=env.Command("awreflow.bin",elf,"arm-none-eabi-objcopy -O binary "+buildoutdir+"/awreflow.elf "+buildoutdir+"/awreflow.bin")
+lst=env.Command("awreflow.lst",elf,"arm-none-eabi-objdump -h -S "+buildoutdir+"/awreflow.elf > "+buildoutdir+"/awreflow.lst")
+size=env.Command("awreflow.size",elf,"arm-none-eabi-size --format=berkeley "+buildoutdir+"/awreflow.elf | tee "+buildoutdir+"/awreflow.size")
+
