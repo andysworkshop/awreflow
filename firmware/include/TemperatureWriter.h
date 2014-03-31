@@ -21,6 +21,7 @@ namespace awreflow {
 
     protected:
       uint16_t _lastWidth;
+      Size _brokenIconOffset;
 
       /*
        * Positions in the digits array
@@ -31,8 +32,20 @@ namespace awreflow {
         BROKEN = 11
       };
 
+      /*
+       * Constant height for the broken icon
+       */
+
+      enum {
+        BROKEN_HEIGHT = 26
+      };
+
     public:
-      TemperatureWriter(Panel::tCOLOUR bg,const NumberWriter::Digit *digits,uint8_t height);
+      TemperatureWriter(
+          Panel::tCOLOUR bg,
+          const NumberWriter::Digit *digits,
+          uint8_t height,
+          const Size& brokenIconOffset);
 
       void redraw(FlashGraphics& flash,const Point& p,const DefaultTemperatureReader::Result& result);
   };

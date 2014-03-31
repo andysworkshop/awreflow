@@ -14,7 +14,7 @@ namespace awreflow {
    * White numbers on a grey background
    */
 
-  const NumberWriter::Digit GreyDigits[11]=
+  const NumberWriter::Digit GreyDigits[12]=
   {
     { FlashInfo::N0_GREY::OFFSET,FlashInfo::N0_GREY::LENGTH,FlashInfo::N0_GREY::WIDTH },
     { FlashInfo::N1_GREY::OFFSET,FlashInfo::N1_GREY::LENGTH,FlashInfo::N1_GREY::WIDTH },
@@ -26,7 +26,8 @@ namespace awreflow {
     { FlashInfo::N7_GREY::OFFSET,FlashInfo::N7_GREY::LENGTH,FlashInfo::N7_GREY::WIDTH },
     { FlashInfo::N8_GREY::OFFSET,FlashInfo::N8_GREY::LENGTH,FlashInfo::N8_GREY::WIDTH },
     { FlashInfo::N9_GREY::OFFSET,FlashInfo::N9_GREY::LENGTH,FlashInfo::N9_GREY::WIDTH },
-    { FlashInfo::DEGREESC::OFFSET,FlashInfo::DEGREESC::LENGTH,FlashInfo::DEGREESC::WIDTH }
+    { FlashInfo::DEGREESC::OFFSET,FlashInfo::DEGREESC::LENGTH,FlashInfo::DEGREESC::WIDTH },
+    { FlashInfo::BROKEN_GREY::OFFSET,FlashInfo::BROKEN_GREY::LENGTH,FlashInfo::BROKEN_GREY::WIDTH }
   };
 
 
@@ -54,7 +55,7 @@ namespace awreflow {
    * White numbers on a purple background
    */
 
-  const NumberWriter::Digit PurpleDigits[11]=
+  const NumberWriter::Digit PurpleDigits[12]=
   {
     { FlashInfo::N0_PURPLE::OFFSET,FlashInfo::N0_PURPLE::LENGTH,FlashInfo::N0_PURPLE::WIDTH },
     { FlashInfo::N1_PURPLE::OFFSET,FlashInfo::N1_PURPLE::LENGTH,FlashInfo::N1_PURPLE::WIDTH },
@@ -66,6 +67,7 @@ namespace awreflow {
     { FlashInfo::N7_PURPLE::OFFSET,FlashInfo::N7_PURPLE::LENGTH,FlashInfo::N7_PURPLE::WIDTH },
     { FlashInfo::N8_PURPLE::OFFSET,FlashInfo::N8_PURPLE::LENGTH,FlashInfo::N8_PURPLE::WIDTH },
     { FlashInfo::N9_PURPLE::OFFSET,FlashInfo::N9_PURPLE::LENGTH,FlashInfo::N9_PURPLE::WIDTH },
-    { FlashInfo::DEGREESC_PURPLE::OFFSET,FlashInfo::DEGREESC_PURPLE::LENGTH,FlashInfo::DEGREESC_PURPLE::WIDTH }
+    { FlashInfo::DEGREESC_PURPLE::OFFSET,FlashInfo::DEGREESC_PURPLE::LENGTH,FlashInfo::DEGREESC_PURPLE::WIDTH },
+    { FlashInfo::BROKEN_PURPLE::OFFSET,FlashInfo::BROKEN_PURPLE::LENGTH,FlashInfo::BROKEN_PURPLE::WIDTH }
   };
 }

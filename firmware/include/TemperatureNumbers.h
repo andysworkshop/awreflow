@@ -11,6 +11,6 @@
 namespace awreflow {
 
   extern const NumberWriter::Digit OrangePurpleDigits[11];
-  extern const NumberWriter::Digit PurpleDigits[11];
-  extern const NumberWriter::Digit GreyDigits[11];
+  extern const NumberWriter::Digit PurpleDigits[12];
+  extern const NumberWriter::Digit GreyDigits[12];
 }

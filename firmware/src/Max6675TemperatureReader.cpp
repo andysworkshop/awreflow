@@ -63,7 +63,7 @@ namespace awreflow {
 
     // check for open thermocouple
 
-    if((value & 0x4)==1)
+    if((value & 0x4)!=0)
       return { 0, Result::E_OPEN_THERMOCOUPLE };
 
     // got a valid value

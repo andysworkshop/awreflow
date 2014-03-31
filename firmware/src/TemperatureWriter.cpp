@@ -15,9 +15,10 @@ namespace awreflow {
    * Constructor
    */
 
-  TemperatureWriter::TemperatureWriter(Panel::tCOLOUR bg,const NumberWriter::Digit *digits,uint8_t height)
+  TemperatureWriter::TemperatureWriter(Panel::tCOLOUR bg,const NumberWriter::Digit *digits,uint8_t height,const Size& brokenIconOffset)
     : IntegerNumberWriter(bg,digits,height),
-      _lastWidth(0) {
+      _lastWidth(0),
+      _brokenIconOffset(brokenIconOffset) {
   }
 
 
@@ -44,29 +45,26 @@ namespace awreflow {
 
       width+=_digits[DEGREES_C].Width;
 
+      // erase any background overhang from last time
+
+      if(width<_lastWidth) {
+
+        Panel::LcdPanel& gl(flash.getGraphicsLibrary());
+
+        gl.setBackground(_backgroundColour);
+        gl.clearRectangle(Rectangle(p.X+width,p.Y,_lastWidth-width,_height));
+      }
+
+      _lastWidth=width;
     }
     else {
 
       // there's something wrong with the comms, show a "broken" icon
 
       flash.drawBitmap(
-          Rectangle(p.X,p.Y,_digits[BROKEN].Width,_height),
+          Rectangle(p.X+_brokenIconOffset.Width,p.Y+_height-BROKEN_HEIGHT+_brokenIconOffset.Height,_digits[BROKEN].Width,BROKEN_HEIGHT),
           _digits[BROKEN].FlashAddress,
           _digits[BROKEN].Length);
-
-      width=_digits[BROKEN].Width;
     }
-
-    // erase any background overhang from last time
-
-    if(width<_lastWidth) {
-
-      Panel::LcdPanel& gl(flash.getGraphicsLibrary());
-
-      gl.setBackground(_backgroundColour);
-      gl.clearRectangle(Rectangle(p.X+width,p.Y,_lastWidth-width,_height));
-    }
-
-    _lastWidth=width;
   }
 }

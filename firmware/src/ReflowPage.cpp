@@ -28,10 +28,6 @@ namespace awreflow {
         UiButton::NO_GRAPHIC, 0,0,0 },
 
     { 555,246,75,55, 0x4d77ba, 0x2e5fae,
-        FlashInfo::TRANSMIT_DISABLED::OFFSET,FlashInfo::TRANSMIT_DISABLED::WIDTH,FlashInfo::TRANSMIT_DISABLED::HEIGHT,FlashInfo::TRANSMIT_DISABLED::LENGTH,
-        UiButton::NO_GRAPHIC, 0,0,0 },
-
-    { 555,311,75,55, 0x4d77ba, 0x2e5fae,
         FlashInfo::EXIT::OFFSET,FlashInfo::EXIT::WIDTH,FlashInfo::EXIT::HEIGHT,FlashInfo::EXIT::LENGTH,
         UiButton::NO_GRAPHIC, 0,0,0 }
   };
@@ -46,8 +42,8 @@ namespace awreflow {
       _selectedButton(START),
       _mode(WAITING),
       _params(params),
-      _currentTemperatureWriter(0x9f489e,PurpleDigits,15),
-      _desiredTemperatureWriter(0x9f489e,OrangePurpleDigits,15) {
+      _currentTemperatureWriter(0x9f489e,PurpleDigits,15,Size(10,15)),
+      _desiredTemperatureWriter(0x9f489e,OrangePurpleDigits,15,Size(0,0)) {
 
     if(params.Leaded)
       _reflowProfile=new LeadedReflowProfile;
@@ -196,10 +192,6 @@ namespace awreflow {
         stopReflow();
         return false;
 
-      case TRANSMIT:
-        transmitResults();
-        return false;
-
       case EXIT:
         return true;
 
@@ -261,7 +253,6 @@ namespace awreflow {
     // enable the "exit" and "transmit" buttons
 
     drawButtonCenteredGraphic(flash,GuiButtons[EXIT]);
-    drawButtonCenteredGraphic(flash,GuiButtons[TRANSMIT],FlashInfo::TRANSMIT::OFFSET);
 
     // move the selected button to "exit"
 
@@ -581,9 +572,9 @@ namespace awreflow {
 
       _desiredTemperatureWriter.redraw(flash,Point(570,82),result);
     }
-    else {
+    else if(result.Status==DefaultTemperatureReader::Result::NO_ERROR) {
 
-      // not cooking, blank out that part of the purple button
+      // not cooking, blank out that part of the purple button if we have a connection
 
       Panel::LcdPanel gl(_panel.getGraphicsLibrary());
 

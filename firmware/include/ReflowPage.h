@@ -28,8 +28,7 @@ namespace awreflow {
         STATUS   = 0,
         START    = 1,
         STOP     = 2,
-        TRANSMIT = 3,
-        EXIT     = 4,
+        EXIT     = 3,
       } _selectedButton;
 
       /*
@@ -75,7 +74,7 @@ namespace awreflow {
       void startReflow();
       void stopReflow();
       void plotProgress();
-      void transmitResults();
+      void transmitResults() const;
       void drawTemperatureButton();
 
     public:
