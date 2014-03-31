@@ -57,6 +57,7 @@ namespace awreflow {
       Pid::variable_t _desiredTemperature;  // the current desired temperature
       Pid::variable_t _currentTemperature;  // the current actual temperature
       Pid::variable_t _temperatureStep;     // how much to add each second to the desired temperature
+      ReflowResults _results;               // the results of the reflow
 
     public:
       Reflow(const ReflowProfile& profile,const ReflowParameters& params);
@@ -69,6 +70,8 @@ namespace awreflow {
       uint16_t getCurrentSeconds() const;
       const Pid::variable_t& getCurrentTemperature() const;
       const Pid::variable_t& getDesiredTemperature() const;
+
+      void transmitResults() const;
   };
 
 
@@ -96,5 +99,14 @@ namespace awreflow {
 
   inline const Pid::variable_t& Reflow::getDesiredTemperature() const {
     return _desiredTemperature;
+  }
+
+
+  /*
+   * Get the reflow results
+   */
+
+  inline void Reflow::transmitResults() const {
+    _results.transmit(_profile);
   }
 }

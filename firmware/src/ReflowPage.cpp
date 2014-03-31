@@ -28,6 +28,10 @@ namespace awreflow {
         UiButton::NO_GRAPHIC, 0,0,0 },
 
     { 555,246,75,55, 0x4d77ba, 0x2e5fae,
+        FlashInfo::TRANSMIT_DISABLED::OFFSET,FlashInfo::TRANSMIT_DISABLED::WIDTH,FlashInfo::TRANSMIT_DISABLED::HEIGHT,FlashInfo::TRANSMIT_DISABLED::LENGTH,
+        UiButton::NO_GRAPHIC, 0,0,0 },
+
+    { 555,311,75,55, 0x4d77ba, 0x2e5fae,
         FlashInfo::EXIT::OFFSET,FlashInfo::EXIT::WIDTH,FlashInfo::EXIT::HEIGHT,FlashInfo::EXIT::LENGTH,
         UiButton::NO_GRAPHIC, 0,0,0 }
   };
@@ -192,6 +196,10 @@ namespace awreflow {
         stopReflow();
         return false;
 
+      case TRANSMIT:
+        transmitResults();
+        return false;
+
       case EXIT:
         return true;
 
@@ -250,9 +258,10 @@ namespace awreflow {
 
     _reflow->stop();
 
-    // enable the "exit" button
+    // enable the "exit" and "transmit" buttons
 
     drawButtonCenteredGraphic(flash,GuiButtons[EXIT]);
+    drawButtonCenteredGraphic(flash,GuiButtons[TRANSMIT],FlashInfo::TRANSMIT::OFFSET);
 
     // move the selected button to "exit"
 
@@ -267,6 +276,26 @@ namespace awreflow {
     // the state is now finished
 
     _mode=FINISHED;
+  }
+
+
+  /*
+   * Transmit the results on the USART
+   */
+
+  void ReflowPage::transmitResults() const {
+
+    // remove the selection while transmission is in progress
+
+    drawSelection(false);
+
+    // transmit the results
+
+    _reflow->transmitResults();
+
+    // redraw the selection
+
+    drawSelection(true);
   }
 
 

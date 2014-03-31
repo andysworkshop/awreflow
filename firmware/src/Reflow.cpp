@@ -65,6 +65,10 @@ namespace awreflow {
     _desiredTemperature=25;       // all profiles start at 25
     _temperatureStep=(_profile[0].Temperature-_desiredTemperature)/_profile[0].EndingTime;
 
+    // reset the reflow results collector
+
+    _results.start(_profile.getTotalDuration());
+
     // reset the last tick value
 
     _lastTick=MillisecondTimer::millis();
@@ -145,6 +149,10 @@ namespace awreflow {
 
     uint8_t pwm=_pid.update(_desiredTemperature,_currentTemperature);
     _relayTimer.setDutyCycle(pwm);
+
+    // update the results
+
+    _results.update(static_cast<uint16_t>(_currentTemperature));
 
     // continue
 

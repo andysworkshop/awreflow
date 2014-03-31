@@ -14,6 +14,7 @@
 
 #include "config/stm32plus.h"
 #include "config/spi.h"
+#include "config/usart.h"
 #include "config/button.h"
 #include "config/timer.h"
 #include "config/display/tft.h"
@@ -49,6 +50,7 @@ using namespace stm32plus::display;
 #include "ReflowProfile.h"
 #include "LeadedReflowProfile.h"
 #include "LeadFreeReflowProfile.h"
+#include "ReflowResults.h"
 #include "Reflow.h"
 #include "ControlPage.h"
 #include "ReflowPage.h"
