@@ -29,6 +29,7 @@ namespace awreflow {
 
       bool _leadedChecked;
       bool _captive;
+      bool _broken;
       TemperatureWriter _temperatureWriter;
       BlueIntegerWriter _p;
       BlueIntegerWriter _i;
@@ -44,6 +45,7 @@ namespace awreflow {
       void handleRight();
       void handleLeft();
       bool handleOk();
+      void handleBroken();
 
     public:
       ControlPage(Panel& panel,Buttons& buttons,const ReflowParameters& params);
@@ -61,6 +63,7 @@ namespace awreflow {
       _selectedButton(REFLOW),
       _leadedChecked(params.Leaded),
       _captive(false),
+      _broken(true),
       _temperatureWriter(0x7a828c,GreyDigits,16,Size(22,-2)),
       _p(params.P,0,999,Point(500,85)),
       _i(params.I,0,999,Point(500,182)),

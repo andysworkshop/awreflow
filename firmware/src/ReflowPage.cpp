@@ -24,7 +24,7 @@ namespace awreflow {
         UiButton::NO_GRAPHIC, 0,0,0 },
 
     { 555,181,75,55, 0x4d77ba, 0x2e5fae,
-        FlashInfo::STOP_DISABLED::OFFSET,FlashInfo::STOP_DISABLED::WIDTH,FlashInfo::STOP_DISABLED::HEIGHT,FlashInfo::STOP_DISABLED::LENGTH,
+        FlashInfo::DOWNLOAD_DISABLED::OFFSET,FlashInfo::DOWNLOAD_DISABLED::WIDTH,FlashInfo::DOWNLOAD_DISABLED::HEIGHT,FlashInfo::DOWNLOAD_DISABLED::LENGTH,
         UiButton::NO_GRAPHIC, 0,0,0 },
 
     { 555,246,75,55, 0x4d77ba, 0x2e5fae,
@@ -39,7 +39,7 @@ namespace awreflow {
 
   ReflowPage::ReflowPage(Panel& panel,Buttons& buttons,const ReflowParameters& params)
     : PageBase(panel,buttons),
-      _selectedButton(START),
+      _selectedButton(STARTSTOP),
       _mode(WAITING),
       _params(params),
       _currentTemperatureWriter(0x9f489e,PurpleDigits,15,Size(10,15)),
@@ -157,13 +157,17 @@ namespace awreflow {
 
     switch(_selectedButton) {
 
-      case START:               // mode must be WAITING
+      case STARTSTOP:           // mode must be WAITING or COOKING
+        if(_mode==WAITING)
+          _selectedButton=EXIT;
+        break;
+
+      case DOWNLOAD:            // mode must be FINISHED
         _selectedButton=EXIT;
         break;
 
-      case EXIT:                // if WAITING then can go to start
-        if(_mode==WAITING)
-          _selectedButton=START;
+      case EXIT:                // mode must be WAITING or FINISHED
+        _selectedButton=_mode==WAITING ? STARTSTOP : DOWNLOAD;
         break;
 
       default:
@@ -184,12 +188,15 @@ namespace awreflow {
 
     switch(_selectedButton) {
 
-      case START:
-        startReflow();
+      case STARTSTOP:
+        if(_mode==WAITING)
+          startReflow();
+        else
+          stopReflow();
         return false;
 
-      case STOP:
-        stopReflow();
+      case DOWNLOAD:
+        transmitResults();
         return false;
 
       case EXIT:
@@ -209,19 +216,12 @@ namespace awreflow {
 
     FlashGraphics flash(_panel);
 
-    // enable the "stop" button
+    // enable the "stop" button in place of "start"
 
-    drawButtonCenteredGraphic(flash,GuiButtons[STOP],FlashInfo::STOP::OFFSET);
+    drawButtonCenteredGraphic(flash,GuiButtons[STARTSTOP],FlashInfo::STOP::OFFSET);
 
-    // move the selected button to "stop"
+    // disable the exit button
 
-    drawSelection(false);
-    _selectedButton=STOP;
-    drawSelection(true);
-
-    // disable the exit and start buttons
-
-    drawButtonCenteredGraphic(flash,GuiButtons[START],FlashInfo::PLAY_DISABLED::OFFSET);
     drawButtonCenteredGraphic(flash,GuiButtons[EXIT],FlashInfo::EXIT_DISABLED::OFFSET);
 
     // reset point plotting
@@ -250,9 +250,10 @@ namespace awreflow {
 
     _reflow->stop();
 
-    // enable the "exit" and "transmit" buttons
+    // enable the "exit" and "download" buttons
 
     drawButtonCenteredGraphic(flash,GuiButtons[EXIT]);
+    drawButtonCenteredGraphic(flash,GuiButtons[DOWNLOAD],FlashInfo::DOWNLOAD::OFFSET);
 
     // move the selected button to "exit"
 
@@ -260,9 +261,9 @@ namespace awreflow {
     _selectedButton=EXIT;
     drawSelection(true);
 
-    // disable the stop button
+    // disable the "stop" button
 
-    drawButtonCenteredGraphic(flash,GuiButtons[STOP],FlashInfo::STOP_DISABLED::OFFSET);
+    drawButtonCenteredGraphic(flash,GuiButtons[STARTSTOP],FlashInfo::STOP_DISABLED::OFFSET);
 
     // the state is now finished
 

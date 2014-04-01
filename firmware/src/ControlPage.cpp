@@ -285,7 +285,12 @@ namespace awreflow {
           break;
 
         case REFLOW:
-          return true;      // trigger this class to exit
+          if(_broken) {
+            handleBroken();
+            break;
+          }
+          else
+            return true;      // trigger this class to exit
 
         default:
           break;
@@ -295,6 +300,31 @@ namespace awreflow {
     // no exit from the page
 
     return false;
+  }
+
+
+  /*
+   * The link to the temperature sensor is broken but the user has clicked on reflow.
+   * Flash the broken icon to draw the attention to it
+   */
+
+  void ControlPage::handleBroken() {
+
+    FlashGraphics flash(_panel);
+    uint8_t i;
+    Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
+    Rectangle rcBroken(374,305,26,26);
+
+    gl.setForeground(0x7a828c);
+
+    for(i=0;i<5;i++) {
+
+      gl.fillRectangle(rcBroken);
+      MillisecondTimer::delay(500);
+
+      flash.drawBitmap(rcBroken,FlashInfo::BROKEN_GREY::OFFSET,FlashInfo::BROKEN_GREY::LENGTH);
+      MillisecondTimer::delay(500);
+    }
   }
 
 
@@ -342,6 +372,10 @@ namespace awreflow {
       DefaultTemperatureReader reader;
       result=reader.readTemperature();
     }
+
+    // record whether the connection is broken
+
+    _broken=result.Status!=DefaultTemperatureReader::Result::NO_ERROR;
 
     // the bus has been released so it's safe to construct the flash object here now
 

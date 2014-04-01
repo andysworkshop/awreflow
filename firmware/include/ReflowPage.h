@@ -25,10 +25,10 @@ namespace awreflow {
        */
 
       enum {
-        STATUS   = 0,
-        START    = 1,
-        STOP     = 2,
-        EXIT     = 3,
+        STATUS    = 0,
+        STARTSTOP = 1,
+        DOWNLOAD  = 2,
+        EXIT      = 3,
       } _selectedButton;
 
       /*
