@@ -45,7 +45,6 @@ namespace awreflow {
         >
       > _relayTimer;
 
-
       DefaultTemperatureReader _temperatureReader;
 
       const ReflowProfile& _profile;
