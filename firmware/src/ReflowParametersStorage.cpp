@@ -19,15 +19,15 @@ namespace awreflow {
     // the flash device deals in pages even though we require far less
     // than that.
 
-    uint8_t page[256];
+    uint32_t page[64];
 
     // copy in the magic number
 
-    *reinterpret_cast<uint32_t *>(page)=0xDEADBEEF;
+    page[0]=0xDEADBEEF;
 
     // bit-copy in the ReflowParameters structure
 
-    memcpy(page+4,&params,sizeof(params));
+    memcpy(&page[1],&params,sizeof(params));
 
     // declare the flash device
 
@@ -40,7 +40,7 @@ namespace awreflow {
 
     // write the last page
 
-    return flash.writeLastPage(page);
+    return flash.writeLastPage(reinterpret_cast<const uint8_t *>(page));
   }
 
 
@@ -53,7 +53,7 @@ namespace awreflow {
     // the flash device deals in pages even though we require far less
     // than that.
 
-    uint8_t page[256];
+    uint32_t page[64];
 
     // declare the flash device
 
@@ -63,17 +63,17 @@ namespace awreflow {
 
     memset(page,0,sizeof(page));
 
-    if(!flash.readLastPage(page))
+    if(!flash.readLastPage(reinterpret_cast<uint8_t *>(page)))
       return false;
 
     // check the magic number
 
-    if(*reinterpret_cast<uint32_t *>(page)!=0xDEADBEEF)
+    if(page[0]!=0xDEADBEEF)
       return false;
 
     // bit-copy out the parameters
 
-    memcpy(&params,page+4,sizeof(params));
+    memcpy(&params,&page[1],sizeof(params));
 
     // completed OK
 

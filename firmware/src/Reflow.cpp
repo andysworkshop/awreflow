@@ -6,6 +6,8 @@
 
 #include "Application.h"
 
+static uint8_t foobar;
+
 
 namespace awreflow {
 
@@ -24,14 +26,14 @@ namespace awreflow {
      * It will take 10ms to do this (100Hz).
      */
 
-    _relayTimer.setTimeBaseByFrequency(10000,99);
+    _relayTimer.setTimeBaseByFrequency(10000,4999);
 
     /*
      * Initialise the channel 4 output compare value to 99 with the default
      * action of toggle.
      */
 
-    _relayTimer.initCompare(99);
+    _relayTimer.initCompare(4999);
 
     /*
      * Set up for PWM output with an initial duty cycle of zero
@@ -75,6 +77,9 @@ namespace awreflow {
 
     // enable the timer for the PWM output on PA11
 
+    foobar=0;
+
+    _relayTimer.setDutyCycle(0);
     _relayTimer.enablePeripheral();
   }
 
@@ -148,7 +153,16 @@ namespace awreflow {
     // run the PID algorithm and set the relay PWM value from the output
 
     uint8_t pwm=_pid.update(_desiredTemperature,_currentTemperature);
+
+#if 0
     _relayTimer.setDutyCycle(pwm);
+#else
+    _relayTimer.setDutyCycle(foobar);
+    if(foobar==100)
+      foobar=0;
+    else
+      foobar+=5;
+#endif
 
     // update the results
 

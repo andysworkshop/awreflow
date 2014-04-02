@@ -143,4 +143,5 @@
 			<resource resourceType="PROJECT" workspacePath="/awreflow"/>
 		</configuration>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>
