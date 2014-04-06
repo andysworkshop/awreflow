@@ -23,12 +23,33 @@ namespace awreflow {
     panel.setBacklight(0);
     MillisecondTimer::delay(1000);
 
-    // draw the splash
+    // clear screen
+
+    Panel::LcdPanel& gl(panel.getGraphicsLibrary());
+    gl.setBackground(ColourNames::BLACK);
+    gl.clearRectangle(Rectangle(0,0,Panel::LcdPanel::LONG_SIDE,Panel::LcdPanel::SHORT_SIDE));
+
+    // draw the "andys workshop" graphic
 
     flash.drawBitmap(
-        Rectangle(0,0,FlashInfo::LOGO640X400::WIDTH,FlashInfo::LOGO640X400::HEIGHT),
-        FlashInfo::LOGO640X400::OFFSET,
-        FlashInfo::LOGO640X400::LENGTH);
+        Rectangle(0,67,FlashInfo::ANDYSWORKSHOP::WIDTH,FlashInfo::ANDYSWORKSHOP::HEIGHT),
+        FlashInfo::ANDYSWORKSHOP::OFFSET,
+        FlashInfo::ANDYSWORKSHOP::LENGTH);
+
+    panel.setBacklight(100);
+    MillisecondTimer::delay(DISPLAY_HOLD_MILLIS);
+
+    // back to black again
+
+    panel.setBacklight(0);
+    MillisecondTimer::delay(1000);
+
+    // draw the "reflow" graphic (full screen)
+
+    flash.drawBitmap(
+        Rectangle(0,0,FlashInfo::LOGO640X360::WIDTH,FlashInfo::LOGO640X360::HEIGHT),
+        FlashInfo::LOGO640X360::OFFSET,
+        FlashInfo::LOGO640X360::LENGTH);
 
     // lights on and hold
 

@@ -20,7 +20,7 @@ namespace awreflow {
         UiButton::NO_GRAPHIC, 0,0,0 },
 
     { 555,116,75,55, 0x4d77ba, 0x2e5fae,
-        FlashInfo::PLAY::OFFSET,FlashInfo::PLAY::WIDTH,FlashInfo::PLAY::HEIGHT,FlashInfo::PLAY::LENGTH,
+        FlashInfo::START::OFFSET,FlashInfo::START::WIDTH,FlashInfo::START::HEIGHT,FlashInfo::START::LENGTH,
         UiButton::NO_GRAPHIC, 0,0,0 },
 
     { 555,181,75,55, 0x4d77ba, 0x2e5fae,

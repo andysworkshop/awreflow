@@ -29,7 +29,7 @@ namespace awreflow {
 
     ControlPage *controlPage;
     ReflowPage *reflowPage;
-#if 0
+
     SplashScreen *splashScreen;
 
     // show the splash screen
@@ -37,7 +37,7 @@ namespace awreflow {
     splashScreen=new SplashScreen;
     splashScreen->show(panel);
     delete splashScreen;
-#endif
+
 
     // go into a loop showing the control page followed by the reflow page
 
