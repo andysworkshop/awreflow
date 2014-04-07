@@ -152,7 +152,7 @@ namespace awreflow {
 
     // run the PID algorithm and set the relay PWM value from the output
 
-    uint8_t pwm=_pid.update(_desiredTemperature,_currentTemperature);
+    uint8_t pwm __attribute__((unused))=_pid.update(_desiredTemperature,_currentTemperature);
 
 #if 0
     _relayTimer.setDutyCycle(pwm);
