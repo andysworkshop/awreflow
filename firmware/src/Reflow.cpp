@@ -6,8 +6,6 @@
 
 #include "Application.h"
 
-static uint8_t foobar;
-
 
 namespace awreflow {
 
@@ -18,26 +16,26 @@ namespace awreflow {
 
   Reflow::Reflow(const ReflowProfile& profile,const ReflowParameters& params)
     : _profile(profile),
-      _pid(params.P,params.I,params.D) {
+      _pid(params.P,params.I,params.D),
+      _paused(false),
+      _relayPercentage(0) {
 
     /*
-     * Set an up-timer up to tick at 10kHz with an auto-reload value of 99
-     * The timer will count from 0 to 99 inclusive then reset back to 0.
-     * It will take 10ms to do this (100Hz).
+     * Set an up-timer up to tick at 10kHz with an auto-reload value of 4999
+     * The timer will count from 0 to 4999 inclusive then reset back to 0.
+     * It will take 500ms to do this (2Hz).
      */
 
     _relayTimer.setTimeBaseByFrequency(10000,4999);
 
     /*
-     * Initialise the channel 4 output compare value to 99 with the default
+     * Initialise the channel 4 output compare value to 4999 with the default
      * action of toggle.
      */
 
     _relayTimer.initCompare(4999);
 
-    /*
-     * Set up for PWM output with an initial duty cycle of zero
-     */
+    // set up for PWM output with an initial duty cycle of zero
 
     _relayTimer.initCompareForPwmOutput(0);
   }
@@ -66,6 +64,7 @@ namespace awreflow {
     _currentTemperature=_temperatureReader.readTemperature().Temperature;
     _desiredTemperature=25;       // all profiles start at 25
     _temperatureStep=(_profile[0].Temperature-_desiredTemperature)/_profile[0].EndingTime;
+    _relayPercentage=0;
 
     // reset the reflow results collector
 
@@ -76,8 +75,6 @@ namespace awreflow {
     _lastTick=MillisecondTimer::millis();
 
     // enable the timer for the PWM output on PA11
-
-    foobar=0;
 
     _relayTimer.setDutyCycle(0);
     _relayTimer.enablePeripheral();
@@ -94,6 +91,7 @@ namespace awreflow {
 
     _relayTimer.setDutyCycle(0);
     _relayTimer.disablePeripheral();
+    _relayPercentage=0;
   }
 
 
@@ -118,27 +116,38 @@ namespace awreflow {
 
     const ReflowProfile::Segment *s=&_profile[_currentSegment];
 
-    // update seconds and see if we've hit the end
+    // if we're in the first second and we are below the starting temperature then auto-pause
+    // until we've heated up to the starting temperature (25 degrees)
 
-    if(s->EndingTime==_currentSeconds) {
+    if(_currentSeconds==0)
+      _paused=_currentTemperature<_desiredTemperature;
 
-      // we have hit the ending time of the current segment. if this is the last segment
-      // then the whole process has completed
+    // advance if we're not paused
 
-      _currentSegment++;
-      if(_currentSegment==_profile.getSegmentCount())
-        return STOP;
+    if(!_paused) {
 
-      // we're in a new segment. set up the parameters for this leg.
+      // update seconds and see if we've hit the end
 
-      s=&_profile[_currentSegment];
-      _temperatureStep=(s->Temperature-_desiredTemperature)/(s->EndingTime-_currentSeconds);
+      if(s->EndingTime==_currentSeconds) {
+
+        // we have hit the ending time of the current segment. if this is the last segment
+        // then the whole process has completed
+
+        _currentSegment++;
+        if(_currentSegment==_profile.getSegmentCount())
+          return STOP;
+
+        // we're in a new segment. set up the parameters for this leg.
+
+        s=&_profile[_currentSegment];
+        _temperatureStep=(s->Temperature-_desiredTemperature)/(s->EndingTime-_currentSeconds);
+      }
+
+      // update seconds and desired temperature
+
+      _currentSeconds++;
+      _desiredTemperature+=_temperatureStep;
     }
-
-    // update seconds and desired temperature
-
-    _currentSeconds++;
-    _desiredTemperature+=_temperatureStep;
 
     // take a temperature reading and abort if there's a hardware failure
 
@@ -147,22 +156,12 @@ namespace awreflow {
     if(result.Status!=DefaultTemperatureReader::Result::NO_ERROR)
       return STOP;
 
-//    _currentTemperature=result.Temperature;
-    _currentTemperature=_desiredTemperature;
+    _currentTemperature=result.Temperature;
 
     // run the PID algorithm and set the relay PWM value from the output
 
-    uint8_t pwm __attribute__((unused))=_pid.update(_desiredTemperature,_currentTemperature);
-
-#if 0
-    _relayTimer.setDutyCycle(pwm);
-#else
-    _relayTimer.setDutyCycle(foobar);
-    if(foobar==100)
-      foobar=0;
-    else
-      foobar+=5;
-#endif
+    _relayPercentage=_pid.update(_desiredTemperature,_currentTemperature);
+    _relayTimer.setDutyCycle(_relayPercentage);
 
     // update the results
 

@@ -25,10 +25,10 @@ namespace awreflow {
        */
 
       enum {
-        STATUS    = 0,
-        STARTSTOP = 1,
-        DOWNLOAD  = 2,
-        EXIT      = 3,
+        STATUS      = 0,
+        START_PAUSE = 1,
+        STOP        = 2,
+        EXIT        = 3,
       } _selectedButton;
 
       /*
@@ -52,12 +52,17 @@ namespace awreflow {
         BOTTOM_MARGIN = 30,
 
         Y_AXIS_HEIGHT = 360-TOP_MARGIN-BOTTOM_MARGIN,
-        X_AXIS_WIDTH = 640-LEFT_MARGIN-RIGHT_MARGIN
+        X_AXIS_WIDTH = 640-LEFT_MARGIN-RIGHT_MARGIN,
+
+        POWER_RECT_X      = 565,
+        POWER_RECT_Y      = 111,
+        POWER_RECT_WIDTH  = 55,
+        POWER_RECT_HEIGHT = 10,
       };
 
       const ReflowParameters& _params;
-      ReflowProfile *_reflowProfile;
-      Reflow *_reflow;
+      scoped_ptr<ReflowProfile> _reflowProfile;
+      scoped_ptr<Reflow> _reflow;
       TemperatureWriter _currentTemperatureWriter;
       TemperatureWriter _desiredTemperatureWriter;
       Point _lastPlottedPoint;
@@ -72,14 +77,14 @@ namespace awreflow {
       void drawProfile(FlashGraphics& flash) const;
       void wideLine(Panel::LcdPanel& gl,const Point& p1,const Point& p2,Panel::tCOLOUR cr) const;
       void startReflow();
+      void pauseOrRestartReflow();
       void stopReflow();
       void plotProgress();
-      void transmitResults() const;
       void drawTemperatureButton();
+      void drawPowerRectangle() const;
 
     public:
       ReflowPage(Panel& panel,Buttons& buttons,const ReflowParameters& params);
-      ~ReflowPage();
 
       void run();
   };

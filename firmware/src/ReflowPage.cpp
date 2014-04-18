@@ -15,19 +15,19 @@ namespace awreflow {
    */
 
   static const UiButton GuiButtons[4]= {
-    { 555,10,75,96, 0xad63ac, 0x9f489e,
+    { 555,10,75,116, 0xad63ac, 0x9f489e,
         UiButton::NO_GRAPHIC, 0,0,0,
         UiButton::NO_GRAPHIC, 0,0,0 },
 
-    { 555,116,75,55, 0x4d77ba, 0x2e5fae,
+    { 555,136,75,55, 0x4d77ba, 0x2e5fae,
         FlashInfo::START::OFFSET,FlashInfo::START::WIDTH,FlashInfo::START::HEIGHT,FlashInfo::START::LENGTH,
         UiButton::NO_GRAPHIC, 0,0,0 },
 
-    { 555,181,75,55, 0x4d77ba, 0x2e5fae,
-        FlashInfo::DOWNLOAD_DISABLED::OFFSET,FlashInfo::DOWNLOAD_DISABLED::WIDTH,FlashInfo::DOWNLOAD_DISABLED::HEIGHT,FlashInfo::DOWNLOAD_DISABLED::LENGTH,
+    { 555,201,75,55, 0x4d77ba, 0x2e5fae,
+        FlashInfo::STOP_DISABLED::OFFSET,FlashInfo::STOP_DISABLED::WIDTH,FlashInfo::STOP_DISABLED::HEIGHT,FlashInfo::STOP_DISABLED::LENGTH,
         UiButton::NO_GRAPHIC, 0,0,0 },
 
-    { 555,246,75,55, 0x4d77ba, 0x2e5fae,
+    { 555,266,75,55, 0x4d77ba, 0x2e5fae,
         FlashInfo::EXIT::OFFSET,FlashInfo::EXIT::WIDTH,FlashInfo::EXIT::HEIGHT,FlashInfo::EXIT::LENGTH,
         UiButton::NO_GRAPHIC, 0,0,0 }
   };
@@ -39,30 +39,20 @@ namespace awreflow {
 
   ReflowPage::ReflowPage(Panel& panel,Buttons& buttons,const ReflowParameters& params)
     : PageBase(panel,buttons),
-      _selectedButton(STARTSTOP),
+      _selectedButton(START_PAUSE),
       _mode(WAITING),
       _params(params),
       _currentTemperatureWriter(0x9f489e,PurpleDigits,15,Size(10,15)),
       _desiredTemperatureWriter(0x9f489e,OrangePurpleDigits,15,Size(0,0)) {
 
     if(params.Leaded)
-      _reflowProfile=new LeadedReflowProfile;
+      _reflowProfile.reset(new LeadedReflowProfile);
     else
-      _reflowProfile=new LeadFreeReflowProfile;
+      _reflowProfile.reset(new LeadFreeReflowProfile);
 
     // create the reflow object
 
-    _reflow=new Reflow(*_reflowProfile,params);
-  }
-
-
-  /*
-   * Destructor
-   */
-
-  ReflowPage::~ReflowPage() {
-    delete _reflow;
-    delete _reflowProfile;
+    _reflow.reset(new Reflow(*_reflowProfile,params));
   }
 
 
@@ -106,9 +96,14 @@ namespace awreflow {
       }
 
       // each second, sample the temperature and display it
+      // if we're cooking, show the power output
 
       if(MillisecondTimer::hasTimedOut(start,1000)) {
         drawTemperatureButton();
+
+        if(_mode==COOKING)
+          drawPowerRectangle();
+
         start=MillisecondTimer::millis();
       }
 
@@ -157,17 +152,17 @@ namespace awreflow {
 
     switch(_selectedButton) {
 
-      case STARTSTOP:           // mode must be WAITING or COOKING
+      case START_PAUSE:           // mode must be WAITING or COOKING
+        _selectedButton=_mode==WAITING ? EXIT : STOP;
+        break;
+
+      case STOP:                  // mode must be COOKING
+        _selectedButton=START_PAUSE;
+        break;
+
+      case EXIT:                  // mode must be WAITING or FINISHED
         if(_mode==WAITING)
-          _selectedButton=EXIT;
-        break;
-
-      case DOWNLOAD:            // mode must be FINISHED
-        _selectedButton=EXIT;
-        break;
-
-      case EXIT:                // mode must be WAITING or FINISHED
-        _selectedButton=_mode==WAITING ? STARTSTOP : DOWNLOAD;
+          _selectedButton=START_PAUSE;
         break;
 
       default:
@@ -188,15 +183,15 @@ namespace awreflow {
 
     switch(_selectedButton) {
 
-      case STARTSTOP:
+      case START_PAUSE:
         if(_mode==WAITING)
           startReflow();
         else
-          stopReflow();
+          pauseOrRestartReflow();
         return false;
 
-      case DOWNLOAD:
-        transmitResults();
+      case STOP:
+        stopReflow();
         return false;
 
       case EXIT:
@@ -216,9 +211,13 @@ namespace awreflow {
 
     FlashGraphics flash(_panel);
 
-    // enable the "stop" button in place of "start"
+    // enable the "pause" button in place of "start"
 
-    drawButtonCenteredGraphic(flash,GuiButtons[STARTSTOP],FlashInfo::STOP::OFFSET);
+    drawButtonCenteredGraphic(flash,GuiButtons[START_PAUSE],FlashInfo::PAUSE::OFFSET);
+
+    // enable the "stop" button
+
+    drawButtonCenteredGraphic(flash,GuiButtons[STOP],FlashInfo::STOP::OFFSET);
 
     // disable the exit button
 
@@ -239,6 +238,28 @@ namespace awreflow {
 
 
   /*
+   * Pause or restart the reflow (freeze time advancing)
+   */
+
+  void ReflowPage::pauseOrRestartReflow() {
+
+    FlashGraphics flash(_panel);
+
+    if(_reflow->getCurrentSeconds()>0) {
+
+      if(_reflow->isPaused()) {
+        _reflow->restart();
+        drawButtonCenteredGraphic(flash,GuiButtons[START_PAUSE],FlashInfo::PAUSE::OFFSET);
+      }
+      else {
+        _reflow->pause();
+        drawButtonCenteredGraphic(flash,GuiButtons[START_PAUSE]);
+      }
+    }
+  }
+
+
+  /*
    * Stop the reflow process
    */
 
@@ -250,10 +271,14 @@ namespace awreflow {
 
     _reflow->stop();
 
-    // enable the "exit" and "download" buttons
+    // disable the "pause" and "stop" buttons
+
+    drawButtonCenteredGraphic(flash,GuiButtons[START_PAUSE],FlashInfo::PAUSE_DISABLED::OFFSET);
+    drawButtonCenteredGraphic(flash,GuiButtons[STOP]);
+
+    // enable the exit button
 
     drawButtonCenteredGraphic(flash,GuiButtons[EXIT]);
-    drawButtonCenteredGraphic(flash,GuiButtons[DOWNLOAD],FlashInfo::DOWNLOAD::OFFSET);
 
     // move the selected button to "exit"
 
@@ -261,33 +286,15 @@ namespace awreflow {
     _selectedButton=EXIT;
     drawSelection(true);
 
-    // disable the "stop" button
+    // erase the power rectangle
 
-    drawButtonCenteredGraphic(flash,GuiButtons[STARTSTOP],FlashInfo::STOP_DISABLED::OFFSET);
+    Panel::LcdPanel& gl(flash.getGraphicsLibrary());
+    gl.setBackground(0x9f489e);
+    gl.clearRectangle(Rectangle(POWER_RECT_X,POWER_RECT_Y,POWER_RECT_WIDTH,POWER_RECT_HEIGHT));
 
     // the state is now finished
 
     _mode=FINISHED;
-  }
-
-
-  /*
-   * Transmit the results on the USART
-   */
-
-  void ReflowPage::transmitResults() const {
-
-    // remove the selection while transmission is in progress
-
-    drawSelection(false);
-
-    // transmit the results
-
-    _reflow->transmitResults();
-
-    // redraw the selection
-
-    drawSelection(true);
   }
 
 
@@ -313,7 +320,7 @@ namespace awreflow {
 
     // lights back on
 
-    _panel.setBacklight(95);
+    _panel.setBacklight(FULL_BRIGHTNESS);
   }
 
 
@@ -582,5 +589,47 @@ namespace awreflow {
       gl.setForeground(0x9f489e);
       gl.fillRectangle(Rectangle(565,76,62,22));
     }
+  }
+
+
+  /*
+   * Draw the power output display rectangle
+   */
+
+  void ReflowPage::drawPowerRectangle() const {
+
+    Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
+    uint16_t green;
+
+    gl.setBackground(0x9f489e);
+
+    // draw the outline
+
+    gl.setForeground(0xad63ac);
+    Rectangle rcPower(POWER_RECT_X,POWER_RECT_Y,POWER_RECT_WIDTH,POWER_RECT_HEIGHT);
+    gl.drawRectangle(rcPower);
+
+    // erase the content
+
+    rcPower.X++;
+    rcPower.Y++;
+    rcPower.Width-=2;
+    rcPower.Height-=2;
+
+    gl.clearRectangle(rcPower);
+
+    // calculate the bar size
+
+    rcPower.Width=((POWER_RECT_WIDTH-2)*static_cast<uint16_t>(_reflow->getRelayPercentage()))/100;
+
+    // set the colour to vary from yellow (0%) to red (100%)
+
+    green=(255*static_cast<uint16_t>(_reflow->getRelayPercentage()))/100;
+
+    gl.setForeground(0xFF0000 | ((255-green) << 8));
+
+    // fill the bar
+
+    gl.fillRectangle(rcPower);
   }
 }

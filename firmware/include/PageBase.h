@@ -12,9 +12,13 @@ namespace awreflow {
   class PageBase {
 
     protected:
-      enum class ButtonSelectionType : uint8_t {
-        NORMAL,
-        SELECTED
+
+      /*
+       * Backlight percentage setting
+       */
+
+      enum {
+        FULL_BRIGHTNESS = 95
       };
 
       Panel& _panel;

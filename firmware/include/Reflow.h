@@ -50,6 +50,8 @@ namespace awreflow {
       const ReflowProfile& _profile;
       Pid _pid;
 
+      bool _paused;                         // true if time is frozen
+      uint8_t _relayPercentage;             // relay output percentage
       uint32_t _lastTick;                   // the last millisecond timer value
       uint16_t _currentSeconds;             // elapsed seconds counter
       uint8_t _currentSegment;              // the reflow segment we're currently processing
@@ -64,14 +66,54 @@ namespace awreflow {
 
       void start();
       void stop();
+      void pause();
+      void restart();
+      bool isPaused() const;
+
       UpdateResult update();
 
       uint16_t getCurrentSeconds() const;
       const Pid::variable_t& getCurrentTemperature() const;
       const Pid::variable_t& getDesiredTemperature() const;
+      uint8_t getRelayPercentage() const;
 
       void transmitResults() const;
   };
+
+
+  /*
+   * Get the output power percentage
+   */
+
+  inline uint8_t Reflow::getRelayPercentage() const {
+    return _relayPercentage;
+  }
+
+  /*
+   * Check if the state is paused
+   */
+
+  inline bool Reflow::isPaused() const {
+    return _paused;
+  }
+
+
+  /*
+   * Pause the reflow (freeze time advance)
+   */
+
+  inline void Reflow::pause() {
+    _paused=true;
+  }
+
+
+  /*
+   * Restart the reflow (time advances again)
+   */
+
+  inline void Reflow::restart() {
+    _paused=false;
+  }
 
 
   /*

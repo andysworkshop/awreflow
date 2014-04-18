@@ -59,7 +59,7 @@ namespace awreflow {
 
      SpiNssManager nss(*_spi);
 
-     // write out as two 16-bit transfers
+     // write out as four 8-bit transfers
 
      _spi->send(bytes,4);
 

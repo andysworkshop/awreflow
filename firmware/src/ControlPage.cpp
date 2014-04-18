@@ -353,7 +353,7 @@ namespace awreflow {
 
     // lights back on
 
-    _panel.setBacklight(95);
+    _panel.setBacklight(FULL_BRIGHTNESS);
   }
 
 

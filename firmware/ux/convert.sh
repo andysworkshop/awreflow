@@ -7,7 +7,7 @@ if [ ! -x ${bm2rgbi} ] ; then
 fi
 
 offset=0
-rm -f spiflash/index.txt
+rm -f spiflash/*
 
 for i in `ls *.png  | sort`; do 
   

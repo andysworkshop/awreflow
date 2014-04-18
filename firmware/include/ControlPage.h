@@ -63,7 +63,7 @@ namespace awreflow {
       _selectedButton(REFLOW),
       _leadedChecked(params.Leaded),
       _captive(false),
-      _broken(true),
+      _broken(false),
       _temperatureWriter(0x7a828c,GreyDigits,16,Size(22,-2)),
       _p(params.P,0,999,Point(500,85)),
       _i(params.I,0,999,Point(500,182)),
