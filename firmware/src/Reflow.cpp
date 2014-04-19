@@ -101,7 +101,7 @@ namespace awreflow {
 
     // has a second elapsed since we were here last?
 
-    if(!MillisecondTimer::hasTimedOut(_lastTick,100))
+    if(!MillisecondTimer::hasTimedOut(_lastTick,1000))
       return NOTHING;
 
     // reset for the next update (now, not after we've burned some cycles doing our update)
@@ -147,7 +147,7 @@ namespace awreflow {
 
     // take a temperature reading and abort if there's a hardware failure
 
-#if 0
+#if 1
     DefaultTemperatureReader::Result result(_temperatureReader.readTemperature());
 #else
     DefaultTemperatureReader::Result result;
