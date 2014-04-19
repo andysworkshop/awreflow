@@ -8,6 +8,11 @@ examples/*/build/
 
 *.o
 *.a
+*.bin
+*.hex
+*.elf
+*.size
+*.lst
 
 # eclipse settings
 
