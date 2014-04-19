@@ -25,27 +25,9 @@ namespace awreflow {
     params.spi_cpol=SPI_CPOL_Low;                             // SPI mode 0
     params.spi_cpha=SPI_CPHA_1Edge;
 
-    // create the SPI peripheral and the DMA channels
+    // create the SPI peripheral
 
-    _spi=new MySpi(params);
-    _rxdma=new MyRxDma;
-    _txdma=new MyTxDma;
-
-    static_cast<DMA_InitTypeDef&>(*_txdma).DMA_MemoryInc=DMA_MemoryInc_Disable;
-  }
-
-
-  /*
-   * Destructor
-   */
-
-  Flash::~Flash() {
-
-    // delete the resources. the SPI peripheral will be de-initialised
-
-    delete _rxdma;
-    delete _txdma;
-    delete _spi;
+    _spi.reset(new MySpi(params));
   }
 
 

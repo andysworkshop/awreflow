@@ -15,6 +15,8 @@ namespace awreflow {
 
   FlashGraphics::FlashGraphics(Panel& panel) :
     _panel(panel) {
+
+    static_cast<DMA_InitTypeDef&>(_txdma).DMA_MemoryInc=DMA_MemoryInc_Disable;
   }
 
 
@@ -39,7 +41,6 @@ namespace awreflow {
   void FlashGraphics::drawBitmap(const Rectangle& rc,uint32_t offset,uint32_t length) {
 
      uint8_t zero,bytes[4];
-     uint8_t *buffer;
      Panel::LcdPanel& gl(_panel.getGraphicsLibrary());
      Panel::LcdAccessMode& accessMode(_panel.getAccessMode());
 
@@ -65,17 +66,17 @@ namespace awreflow {
 
      // get a temporary buffer and set the dummy byte to zero
 
-     buffer=new uint8_t[READ_BUFFER_SIZE];
+     uint8_t buffer[READ_BUFFER_SIZE];
      zero=0;
 
      while(length>=READ_BUFFER_SIZE) {
 
        // start a read and wait for half complete
 
-       _rxdma->beginRead(buffer,READ_BUFFER_SIZE);
-       _txdma->beginWrite(&zero,READ_BUFFER_SIZE);
+       _rxdma.beginRead(buffer,READ_BUFFER_SIZE);
+       _txdma.beginWrite(&zero,READ_BUFFER_SIZE);
 
-       while(!_rxdma->isHalfComplete());
+       while(!_rxdma.isHalfComplete());
 
        // transfer the first half to the display while the other half is finishing off
 
@@ -83,7 +84,7 @@ namespace awreflow {
 
        // wait for the full complete
 
-       while(!_rxdma->isComplete());
+       while(!_rxdma.isComplete());
 
        // transfer the second half
 
@@ -93,15 +94,18 @@ namespace awreflow {
 
      if(length>0) {
 
-       // receive and transfer synchronously
+       // last block, do it all at once
 
-       _spi->receive(buffer,length);
+       _rxdma.beginRead(buffer,length);
+       _txdma.beginWrite(&zero,length);
+
+       // wait for complete
+
+       while(!_rxdma.isComplete());
+
+       // do the transfer
+
        accessMode.rawTransfer(buffer,length/2);
      }
-
-
-     // clean up
-
-     delete [] buffer;
    }
 }

@@ -29,10 +29,6 @@ namespace awreflow {
         Pin_MOSI = GPIO_Pin_7
       };
 
-      enum {
-        READ_BUFFER_SIZE = 1024
-      };
-
     protected:
 
       /*
@@ -40,17 +36,7 @@ namespace awreflow {
        */
 
       typedef Spi1_Custom<Flash,SpiFifoNotifyQuarterFullFeature> MySpi;
-      MySpi *_spi;
-
-      /*
-       * Declare the SPI1 DMA channel that we'll use. It operates in 8-bit mode
-       */
-
-      typedef Spi1RxDmaChannel<SpiDmaReaderFeature<Spi1PeripheralTraits> > MyRxDma;
-      typedef Spi1TxDmaChannel<SpiDmaWriterFeature<Spi1PeripheralTraits> > MyTxDma;
-
-      MyRxDma *_rxdma;
-      MyTxDma *_txdma;
+      scoped_ptr<MySpi> _spi;
 
       /*
        * Inner class to manage the NSS pin using the
@@ -76,7 +62,6 @@ namespace awreflow {
 
     public:
       Flash();
-      ~Flash();
 
       bool eraseLastSector() const;
       bool writeLastPage(const uint8_t *page) const;

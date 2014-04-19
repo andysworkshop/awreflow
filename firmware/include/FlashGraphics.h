@@ -18,6 +18,25 @@ namespace awreflow {
   class FlashGraphics : public Flash {
 
     protected:
+
+      /*
+       * Size of the buffer for the DMA transfer
+       */
+
+      enum {
+        READ_BUFFER_SIZE = 1024
+      };
+
+      /*
+       * Declare the SPI1 DMA channel that we'll use. It operates in 8-bit mode
+       */
+
+      typedef Spi1RxDmaChannel<SpiDmaReaderFeature<Spi1PeripheralTraits> > MyRxDma;
+      typedef Spi1TxDmaChannel<SpiDmaWriterFeature<Spi1PeripheralTraits> > MyTxDma;
+
+      MyRxDma _rxdma;
+      MyTxDma _txdma;
+
       Panel& _panel;
 
     public:

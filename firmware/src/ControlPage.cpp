@@ -153,15 +153,15 @@ namespace awreflow {
           break;
 
         case LEAD_FREE:
-          _selectedButton=REFLOW;
-          break;
-
-        case REFLOW:
           _selectedButton=LEADED;
           break;
 
-        case PROPORTIONAL:
+        case REFLOW:
           _selectedButton=LEAD_FREE;
+          break;
+
+        case PROPORTIONAL:
+          _selectedButton=REFLOW;
           break;
 
         case INTEGER:
@@ -220,15 +220,15 @@ namespace awreflow {
       switch(_selectedButton) {
 
         case LEADED:
-          _selectedButton=REFLOW;
+          _selectedButton=LEAD_FREE;
           break;
 
         case LEAD_FREE:
-          _selectedButton=PROPORTIONAL;
+          _selectedButton=REFLOW;
           break;
 
         case REFLOW:
-          _selectedButton=LEAD_FREE;
+          _selectedButton=PROPORTIONAL;
           break;
 
         case PROPORTIONAL:
