@@ -94,17 +94,9 @@ namespace awreflow {
 
      if(length>0) {
 
-       // last block, do it all at once
+       // receive and transfer the remainder synchronously
 
-       _rxdma.beginRead(buffer,length);
-       _txdma.beginWrite(&zero,length);
-
-       // wait for complete
-
-       while(!_rxdma.isComplete());
-
-       // do the transfer
-
+       _spi->receive(buffer,length);
        accessMode.rawTransfer(buffer,length/2);
      }
    }
