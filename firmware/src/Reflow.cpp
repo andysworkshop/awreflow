@@ -66,10 +66,6 @@ namespace awreflow {
     _temperatureStep=(_profile[0].Temperature-_desiredTemperature)/_profile[0].EndingTime;
     _relayPercentage=0;
 
-    // reset the reflow results collector
-
-    _results.start(_profile.getTotalDuration());
-
     // reset the last tick value
 
     _lastTick=MillisecondTimer::millis();
@@ -105,7 +101,7 @@ namespace awreflow {
 
     // has a second elapsed since we were here last?
 
-    if(!MillisecondTimer::hasTimedOut(_lastTick,1000))
+    if(!MillisecondTimer::hasTimedOut(_lastTick,100))
       return NOTHING;
 
     // reset for the next update (now, not after we've burned some cycles doing our update)
@@ -151,7 +147,14 @@ namespace awreflow {
 
     // take a temperature reading and abort if there's a hardware failure
 
+#if 0
     DefaultTemperatureReader::Result result(_temperatureReader.readTemperature());
+#else
+    DefaultTemperatureReader::Result result;
+
+    result.Status=DefaultTemperatureReader::Result::NO_ERROR;
+    result.Temperature=_desiredTemperature+((rand() % 4)-2);
+#endif
 
     if(result.Status!=DefaultTemperatureReader::Result::NO_ERROR)
       return STOP;
@@ -162,10 +165,6 @@ namespace awreflow {
 
     _relayPercentage=_pid.update(_desiredTemperature,_currentTemperature);
     _relayTimer.setDutyCycle(_relayPercentage);
-
-    // update the results
-
-    _results.update(static_cast<uint16_t>(_currentTemperature));
 
     // continue
 

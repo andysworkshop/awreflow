@@ -458,6 +458,11 @@ namespace awreflow {
     uint32_t seconds(_reflow->getCurrentSeconds());
     Pid::variable_t temperature(_reflow->getCurrentTemperature());
 
+    // clip the max temperature in case we run off the top
+
+    if(temperature>_reflowProfile->getMaxTemperature())
+      temperature=_reflowProfile->getMaxTemperature();
+
     // calculate the point on the chart
 
     p2.X=LEFT_MARGIN+((seconds*X_AXIS_WIDTH)/_reflowProfile->getTotalDuration());

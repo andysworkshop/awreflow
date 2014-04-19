@@ -50,7 +50,6 @@ using namespace stm32plus::display;
 #include "ReflowProfile.h"
 #include "LeadedReflowProfile.h"
 #include "LeadFreeReflowProfile.h"
-#include "ReflowResults.h"
 #include "Reflow.h"
 #include "ControlPage.h"
 #include "ReflowPage.h"
