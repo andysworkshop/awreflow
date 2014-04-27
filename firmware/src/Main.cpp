@@ -76,6 +76,9 @@ namespace awreflow {
    * Set up any pins that need to have their modes set up front
    */
 
+  template<uint8_t... TPins>
+  using InputPullDown=DigitalInputFeature<GPIO_Speed_Level_3,Gpio::PUPD_DOWN,TPins...>;
+
   void Main::setDefaultPins() const {
 
     // the two SPI NSS pins need to be set up and HIGH
@@ -86,6 +89,13 @@ namespace awreflow {
     pa[3].set();
     pa[4].set();
     pa[11].reset();
+
+    // set the unused pins to input pull-down so anything that's floating
+    // doesn't cause excessive power consumption
+
+    GpioA<InputPullDown<8,12,15>> paUnused;
+    GpioC<InputPullDown<13,15>> pcUnused;
+    GpioF<InputPullDown<6,7>> pfUnused;
   }
 }
 
