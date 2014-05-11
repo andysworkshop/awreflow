@@ -6,7 +6,7 @@ You can use this controller to control the power output of an oven. The controll
 
 ## Learn more
 
-All the documentation and guidance that you need is contained in a writeup on my website. Click here to visit.
+All the documentation and guidance that you need is contained in a writeup on my website. [Click here](http://www.andybrown.me.uk) to visit.
 
 ## Compile the firmware
 
@@ -14,7 +14,7 @@ So you've built a controller and you need to compile the firmware? It's quite st
 
 ### Prerequisites
 
-* CodeSourcery (a.k.a Mentor Graphics) Sourcery G++ Lite (EABI edition). It's free, go ahead and download it from their website. Other toolchains may work but have not been validated by me.
+* An 'arm-none-eabi' toolchain. At the time of writing I have validated that the CodeSourcery (a.k.a Mentor Graphics) Sourcery G++ Lite (EABI edition) and the ARM Launchpad toolchain both work. Other toolchains may work but have not been validated by me.
 
 * stm32plus built for the F0, at least version 3.2.0. Visit my repo to download, build and install the latest release.
 
