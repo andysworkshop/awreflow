@@ -2,6 +2,8 @@
 
 This project contains the open-source firmware for the STM32F0 MCU embedded in this reflow oven controller.
 
+![controller and oven](http://andybrown.me.uk/wk/wp-content/images//awreflow/setup.jpg)
+
 You can use this controller to control the power output of an oven. The controller will modulate the power to ensure that the temperature follows a reflow solder profile.
 
 ## Learn more
