@@ -4,18 +4,19 @@
 
 # These variables must be set correctly
 
-STM32PLUS_INSTALL_DIR = "p:/docs/cyghome/andy/tmp/stm32plus"
-STM32PLUS_SRC_DIR     = "p:/docs/source/stm32plus"
-STM32PLUS_VERSION     = "030200"
+STM32PLUS_INSTALL_DIR = "/usr/lib/stm32plus"
+STM32PLUS_VERSION     = "030300"
 
 # main build script
 
 import os
 import os.path
+import platform
+from subprocess import check_output
 
 def usage():
 
-        print """
+    print """
 Usage: scons mode=<MODE>
 
   <MODE>: debug/fast/small.
@@ -34,8 +35,8 @@ Usage: scons mode=<MODE>
 mode=ARGUMENTS.get('mode')
 
 if not (mode in ['debug', 'fast', 'small']):
-	usage()
-	Exit(1)
+    usage()
+    Exit(1)
 
 # set up build environment and pull in OS environment variables
 
@@ -43,11 +44,13 @@ env=Environment(ENV=os.environ)
 
 # verify that stm32plus is installed in the defined location
 
-stm32plus_file=STM32PLUS_INSTALL_DIR+"/"+STM32PLUS_VERSION+"/libstm32plus-"+STM32PLUS_VERSION+"-f051-"+mode+".a"
-if not os.path.isfile(stm32plus_file):
-	print stm32plus_file+" does not exist."
-	print "Please edit SConstruct and check the STM32PLUS_INSTALL_DIR and STM32PLUS_VERSION variables."
-	Exit(1)
+STM32PLUS_ROOT=STM32PLUS_INSTALL_DIR+"/"+STM32PLUS_VERSION
+
+stm32plus_lib=STM32PLUS_ROOT+"/libstm32plus-"+STM32PLUS_VERSION+"-"+mode+"-f051-8000000.a"
+if not os.path.isfile(stm32plus_lib):
+    print stm32plus_file+" does not exist."
+    print "Please edit SConstruct and check the STM32PLUS_INSTALL_DIR and STM32PLUS_VERSION variables."
+    Exit(1)
 
 # replace the compiler values in the environment
 
@@ -65,12 +68,17 @@ env.Append(LINKFLAGS=["-Tsystem/f051/Linker.ld","-Wl,-wrap,__aeabi_unwind_cpp_pr
 
 # set the include directories
 
-env.Append(CPPPATH=["include",STM32PLUS_SRC_DIR+"/lib/include",STM32PLUS_SRC_DIR+"/lib/include/stl",STM32PLUS_SRC_DIR+"/lib"])
+env.Append(CPPPATH=["include",
+    STM32PLUS_ROOT+"/include",
+    STM32PLUS_ROOT+"/include/stl",
+    STM32PLUS_ROOT])
+
+env.Append(CPPPATH=["include"])
 
 # set the library path
 
-env.Append(LIBS="stm32plus-"+STM32PLUS_VERSION+"-f051-small")
-env.Append(LIBPATH=STM32PLUS_INSTALL_DIR+"/"+STM32PLUS_VERSION)
+env.Append(LIBS="stm32plus-"+STM32PLUS_VERSION+"-"+mode+"-f051-8000000.a")
+env.Append(LIBPATH=STM32PLUS_ROOT)
 
 # collect the source files
 
@@ -90,11 +98,11 @@ linkerscript="system/f051/Linker.ld"
 # add on the mode=specific optimisation definitions
 
 if mode=="debug":
-        env.Append(CCFLAGS=["-O0","-g3"])
+    env.Append(CCFLAGS=["-O0","-g3"])
 elif mode=="fast":
-        env.Append(CCFLAGS=["-O3"])
+    env.Append(CCFLAGS=["-O3"])
 elif mode=="small":
-        env.Append(CCFLAGS=["-Os"])
+    env.Append(CCFLAGS=["-Os"])
 
 # trigger a build with the correct output name
 
@@ -103,4 +111,3 @@ hex=env.Command("awreflow.hex",elf,"arm-none-eabi-objcopy -O ihex awreflow.elf a
 bin=env.Command("awreflow.bin",elf,"arm-none-eabi-objcopy -O binary awreflow.elf awreflow.bin")
 lst=env.Command("awreflow.lst",elf,"arm-none-eabi-objdump -h -S awreflow.elf > awreflow.lst")
 size=env.Command("awreflow.size",elf,"arm-none-eabi-size --format=berkeley awreflow.elf | tee awreflow.size")
-
