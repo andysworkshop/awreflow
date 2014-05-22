@@ -18,7 +18,7 @@ So you've built a controller and you need to compile the firmware? It's quite st
 
 * An 'arm-none-eabi' toolchain. At the time of writing I have validated that the CodeSourcery (a.k.a Mentor Graphics) Sourcery G++ Lite (EABI edition) and the ARM Launchpad toolchain both work. Other toolchains may work but have not been validated by me.
 
-* stm32plus built for the F0, at least version 3.2.0. Visit my repo to download, build and install the latest release.
+* stm32plus built for the F0, at least version 3.3.0. Visit my repo to download, build and install the latest release.
 
 * The 'scons' build system, but you've already got that if you've built stm32plus in the previous step.
 
