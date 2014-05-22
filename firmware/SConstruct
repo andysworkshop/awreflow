@@ -4,7 +4,7 @@
 
 # These variables must be set correctly
 
-STM32PLUS_INSTALL_DIR = "/usr/lib/stm32plus"
+STM32PLUS_INSTALL_DIR = "/usr/local/arm-none-eabi"
 STM32PLUS_VERSION     = "030300"
 
 # main build script
@@ -44,9 +44,7 @@ env=Environment(ENV=os.environ)
 
 # verify that stm32plus is installed in the defined location
 
-STM32PLUS_ROOT=STM32PLUS_INSTALL_DIR+"/"+STM32PLUS_VERSION
-
-stm32plus_lib=STM32PLUS_ROOT+"/libstm32plus-"+STM32PLUS_VERSION+"-"+mode+"-f051-8000000.a"
+stm32plus_lib=STM32PLUS_INSTALL_DIR+"/lib/stm32plus-"+STM32PLUS_VERSION+"/libstm32plus-"+mode+"-f051-8000000.a"
 if not os.path.isfile(stm32plus_lib):
     print stm32plus_file+" does not exist."
     print "Please edit SConstruct and check the STM32PLUS_INSTALL_DIR and STM32PLUS_VERSION variables."
@@ -69,16 +67,15 @@ env.Append(LINKFLAGS=["-Tsystem/f051/Linker.ld","-Wl,-wrap,__aeabi_unwind_cpp_pr
 # set the include directories
 
 env.Append(CPPPATH=["include",
-    STM32PLUS_ROOT+"/include",
-    STM32PLUS_ROOT+"/include/stl",
-    STM32PLUS_ROOT])
+    STM32PLUS_INSTALL_DIR+"/include/stm32plus-"+STM32PLUS_VERSION,
+    STM32PLUS_INSTALL_DIR+"/include/stm32plus-"+STM32PLUS_VERSION+"/stl"])
 
 env.Append(CPPPATH=["include"])
 
 # set the library path
 
-env.Append(LIBS="stm32plus-"+STM32PLUS_VERSION+"-"+mode+"-f051-8000000.a")
-env.Append(LIBPATH=STM32PLUS_ROOT)
+env.Append(LIBS="stm32plus-"+mode+"-f051-8000000.a")
+env.Append(LIBPATH=STM32PLUS_INSTALL_DIR+"/lib/stm32plus-"+STM32PLUS_VERSION)
 
 # collect the source files
 
