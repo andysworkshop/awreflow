@@ -46,7 +46,7 @@ env=Environment(ENV=os.environ)
 
 stm32plus_lib=STM32PLUS_INSTALL_DIR+"/lib/stm32plus-"+STM32PLUS_VERSION+"/libstm32plus-"+mode+"-f051-8000000.a"
 if not os.path.isfile(stm32plus_lib):
-    print stm32plus_file+" does not exist."
+    print stm32plus_lib+" does not exist."
     print "Please edit SConstruct and check the STM32PLUS_INSTALL_DIR and STM32PLUS_VERSION variables."
     Exit(1)
 
