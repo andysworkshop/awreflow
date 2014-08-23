@@ -31,6 +31,13 @@ namespace awreflow {
     uint16_t width;
 
     if(result.Status==DefaultTemperatureReader::Result::NO_ERROR) {
+      
+      // clear broken symbol
+      
+      Panel::LcdPanel& gl(flash.getGraphicsLibrary());
+
+      gl.setBackground(_backgroundColour);
+      gl.clearRectangle(Rectangle(p.X+_brokenIconOffset.Width,p.Y+_height-BROKEN_HEIGHT+_brokenIconOffset.Height,_digits[BROKEN].Width,BROKEN_HEIGHT));
 
       // write the number
 
@@ -58,6 +65,13 @@ namespace awreflow {
       _lastWidth=width;
     }
     else {
+      
+      // erase any background overhang from last time it shows a temperature value
+      
+      Panel::LcdPanel& gl(flash.getGraphicsLibrary());
+
+      gl.setBackground(_backgroundColour);
+      gl.clearRectangle(Rectangle(p.X,p.Y,_brokenIconOffset.Width,_height));
 
       // there's something wrong with the comms, show a "broken" icon
 
