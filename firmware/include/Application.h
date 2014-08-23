@@ -38,6 +38,7 @@ using namespace stm32plus::display;
 #include "PageBase.h"
 #include "TemperatureReader.h"
 #include "Max6675TemperatureReader.h"
+#include "Max31855TemperatureReader.h"
 #include "NumberWriter.h"
 #include "IntegerNumberWriter.h"
 #include "AxisNumberWriter.h"
