@@ -53,3 +53,7 @@ ipch/
 obj/
 [dD]ebug_*/
 [Rr]elease_*/
+*.elf
+*.hex
+*.lst
+*.size

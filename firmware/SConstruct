@@ -5,14 +5,14 @@
 # These variables must be set correctly
 
 STM32PLUS_INSTALL_DIR = "/usr/local/arm-none-eabi"
-STM32PLUS_VERSION     = "030300"
+STM32PLUS_VERSION     = "030400"
 
 # main build script
 
 import os
 import os.path
 import platform
-from subprocess import check_output
+import subprocess
 
 def usage():
 
@@ -64,18 +64,36 @@ env.Append(ASFLAGS="-mcpu=cortex-m0")
 env.Append(LINKFLAGS=["-Xlinker","--gc-sections","-mthumb","-g3","-gdwarf-2","-mcpu=cortex-m0"])
 env.Append(LINKFLAGS=["-Tsystem/f051/Linker.ld","-Wl,-wrap,__aeabi_unwind_cpp_pr0","-Wl,-wrap,__aeabi_unwind_cpp_pr1","-Wl,-wrap,__aeabi_unwind_cpp_pr2"])
 
-# set the include directories
+# set the include directories - not a simple task on cygwin
 
-env.Append(CPPPATH=["include",
-    STM32PLUS_INSTALL_DIR+"/include/stm32plus-"+STM32PLUS_VERSION,
-    STM32PLUS_INSTALL_DIR+"/include/stm32plus-"+STM32PLUS_VERSION+"/stl"])
+if "cygwin" in platform.system().lower():
 
-env.Append(CPPPATH=["include"])
+  # g++ must see the windows style C:/foo/bar path, not the cygwin /usr/foo/bar style so we must translate the
+  # paths here. also, scons will try to interpret ":" as a separator in cygwin which gives us the additional problem
+  # of not being able to use the interpreted CPPPATH. We have to use CXX flags instead. 
+
+  proc=subprocess.Popen("cygpath --mixed "+STM32PLUS_INSTALL_DIR,stdout=subprocess.PIPE,shell=True)
+  (cygbasepath,err)=proc.communicate()
+  cygbasepath=cygbasepath.rstrip("\n");     # chomp the newline
+
+  env.Append(CCFLAGS="-I"+cygbasepath+"/include/stm32plus-"+STM32PLUS_VERSION)
+  env.Append(CXXFLAGS="-I"+cygbasepath+"/include/stm32plus-"+STM32PLUS_VERSION+"/stl")
+  env.Append(LINKFLAGS="-L"+cygbasepath+"/lib/stm32plus-"+STM32PLUS_VERSION)
+
+else:
+  env.Append(CPPPATH=[
+      STM32PLUS_INSTALL_DIR+"/include/stm32plus-"+STM32PLUS_VERSION,
+      STM32PLUS_INSTALL_DIR+"/include/stm32plus-"+STM32PLUS_VERSION+"/stl"])
+  
+  env.Append(LIBPATH=STM32PLUS_INSTALL_DIR+"/lib/stm32plus-"+STM32PLUS_VERSION)
+
+# set the common include directory
+
+env.Append(CPPPATH="include")
 
 # set the library path
 
 env.Append(LIBS="stm32plus-"+mode+"-f051-8000000.a")
-env.Append(LIBPATH=STM32PLUS_INSTALL_DIR+"/lib/stm32plus-"+STM32PLUS_VERSION)
 
 # collect the source files
 

@@ -38,7 +38,7 @@ namespace awreflow {
 
       Timer1<
         Timer1InternalClockFeature,       // the timer clock source is internal
-        TimerChannel4Feature,             // we're going to use channel 4
+        TimerChannel4Feature<>,           // we're going to use channel 4
         Timer1GpioFeature<                // we want to output something to GPIO
           TIMER_REMAP_NONE,               // the GPIO output will not be remapped
           TIM1_CH4_OUT                    // we will output channel 4 to GPIO
