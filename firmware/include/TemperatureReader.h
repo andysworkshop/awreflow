@@ -26,6 +26,7 @@ namespace awreflow {
         enum {
           NO_ERROR,
           E_OPEN_THERMOCOUPLE,
+	  E_SHORT_THERMOCOUPLE,
           E_COMMS_FAILURE
         } Status;
       };

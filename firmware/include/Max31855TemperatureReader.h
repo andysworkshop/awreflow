@@ -12,10 +12,10 @@ namespace awreflow {
 
 
   /*
-   * Implementation of the temperature reader for the MAX6675
+   * Implementation of the temperature reader for the MAX31855
    */
 
-  struct Max6675TemperatureReader : TemperatureReader<Max6675TemperatureReader> {
+  struct Max31855TemperatureReader : TemperatureReader<Max31855TemperatureReader> {
 
     /*
      * SPI definitions
@@ -45,5 +45,5 @@ namespace awreflow {
    * Declare this temperature reader as the one we're going to use
    */
 
-  //typedef Max6675TemperatureReader DefaultTemperatureReader;
+  typedef Max31855TemperatureReader DefaultTemperatureReader;
 }
