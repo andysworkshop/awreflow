@@ -1,32 +1,71 @@
-# Andy's Workshop Graphics Coprocessor
+# Andy's Workshop Reflow Oven Controller
 
-This project contains the Arduino library and STM32 firmware for my graphics coprocessor project.
+This project contains the open-source firmware for the STM32F0 MCU embedded in this reflow oven controller.
 
-![Graphics Coprocessor](http://i0.wp.com/andybrown.me.uk/wk/wp-content/images/awcopper/test_image_small.jpg)
+![controller and oven](http://andybrown.me.uk/wk/wp-content/images//awreflow/setup.jpg)
 
-### Project documentation
-[Click here](http://andybrown.me.uk/wk/2015/02/02/awcopper) to go to my website to read the full project documentation.
+You can use this controller to control the power output of an oven. The controller will modulate the power to ensure that the temperature follows a reflow solder profile.
 
-## Arduino library
+## Learn more
 
-It's in the `arduino` folder in the `awcopper.zip` file. [Here's a guide](http://arduino.cc/en/Guide/Libraries) to installing Arduino libraries. Personally I just extract the zip file into the Arduino IDE's `libraries` folder.
+All the documentation and guidance that you need is contained in a writeup on my website. [Click here](http://www.andybrown.me.uk) to visit.
 
-If you should make any modifications to the library or the examples then you can run the `build.sh` script to rebuild the `awcopper.zip` archive. `build.sh` is a shell script so you'll need to be running Linux or Cygwin on Windows.
+## Compile the firmware
 
-## STM32 firmware
+So you've built a controller and you need to compile the firmware? It's quite straightforward. Here's how.
 
-It's in the `stm32` folder. If you're just looking for something to flash then take a look in the `hex` folder. You'll find both the standard and overclocked versions of the firmware ready and waiting for you to flash to the STM32.
+### Prerequisites
 
-If you make any changes to the library then you'll need to rebuild it using the `scons` build system. The project documentation over at my website goes into this in a little more detail. Note that there is a dependency on my [stm32plus](https://github.com/andysworkshop/stm32plus) library so make sure you've cloned and installed stm32plus before you attempt to build the awcopper firmware.
+* An 'arm-none-eabi' toolchain. At the time of writing I have validated that the CodeSourcery (a.k.a Mentor Graphics) Sourcery G++ Lite (EABI edition) and the ARM Launchpad toolchain both work. Other toolchains may work but have not been validated by me.
 
-## PC software
+* stm32plus built for the F0, at least version 3.3.0. Visit my repo to download, build and install the latest release.
 
-It's in the `pc` folder. There's just one utility included with this library, `UploadToFlash` is the C# application that allows you to send graphics files to the SPI flash IC on the board. If you're just looking for the executable program then you'll find it in the `bin\Debug` or `bin\Release` folder.
+* The 'scons' build system, but you've already got that if you've built stm32plus in the previous step.
 
-## Other software
+### Build the firmware
 
-If you're looking for the `bm2rgbi` image converter that was mentioned in the main project writeup then you'll find it in the [stm32plus](https://github.com/andysworkshop/stm32plus) library project.
+`cd` into the `firmware` directory and edit the `SConstruct` file. You will probably have to change `STM32PLUS_INSTALL_DIR`, `STM32PLUS_SRC_DIR` and `STM32PLUS_VERSION` to match your system.
 
-## API documentation
+Now, assuming that you want an optimised build you can just type:
 
-If you're going to use the Arduino library then you'll need the API documentation. It's right here on github, take a look at the `api.md` markdown file.
+`scons mode=fast`
+
+This will compile the firmware and produce you a file called `awreflow.hex` that can be flashed to your controller board using the official STLink/v2 debugging dongle and the software driver the comes with it.
+
+### Flash the graphics to the onboard SPI flash
+
+You need a second STM32 development board to do this and that board needs to have an SDIO SD card slot and a USART port. I use an STM32F103 board that I got on ebay to do this.
+
+1. Copy the `spiflash` directory from `firmware/ux` to the root of an SD card and insert the card into your development board.
+
+2. Flash the stm32plus `flash_spi_program` example to your development board.
+
+3. Connect your development board to the oven controller using the following pinout (development board => controller board).
+
+		MCU HEADER:
+			3.3v => 3.3v
+			GND  => GND
+			GND  => RESET
+		
+		SPI HEADER:
+			PB12 => nCS_FLASH
+			PB13 => SCLK
+			PB14 => MISO
+			PB15 => MOSI
+			3.3v => nCS_OVEN
+
+4. Remove the `PWR_SEL` jumper to isolate the voltage regulator. Remove your ST-Link/v2 if it's connected.
+
+5. Connect a serial cable to your development board's USART1 port and run a PC serial program so you can see the output. Configure the program for a 57600/8/N/1 protocol.
+
+6. Power up the development board and watch the USART output for status reports.
+
+### Calibrating the temperature
+
+The MAX6675 temperature sensor provides a good linear output but often needs a simple integer offset to read the correct temperature. For example, I have to subtract 5 from the reading to get a reading that matches my room thermometer. That offset is compiled into the firmware. To change it, edit `firmware/include/Max6675TemperatureReader.h` and change the value of this enumeration:
+
+	enum {
+      CALIBRATION_OFFSET = -5
+    };
+
+Recompile with `scons` and reflash after making any changes.
