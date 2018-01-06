@@ -19,7 +19,6 @@
 #include "config/timer.h"
 #include "config/display/tft.h"
 #include "config/smartptr.h"
-#include "util/MinMax.h"
 
 // make the declarations less verbose
 

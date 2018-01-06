@@ -5,7 +5,7 @@
 # These variables must be set correctly
 
 STM32PLUS_INSTALL_DIR = "/usr/local/arm-none-eabi"
-STM32PLUS_VERSION     = "030400"
+STM32PLUS_VERSION     = "040100"
 
 # main build script
 
@@ -44,7 +44,7 @@ env=Environment(ENV=os.environ)
 
 # verify that stm32plus is installed in the defined location
 
-stm32plus_lib=STM32PLUS_INSTALL_DIR+"/lib/stm32plus-"+STM32PLUS_VERSION+"/libstm32plus-"+mode+"-f051-8000000.a"
+stm32plus_lib=STM32PLUS_INSTALL_DIR+"/lib/stm32plus-"+STM32PLUS_VERSION+"/libstm32plus-"+mode+"-f051-8000000i.a"
 if not os.path.isfile(stm32plus_lib):
     print stm32plus_lib+" does not exist."
     print "Please edit SConstruct and check the STM32PLUS_INSTALL_DIR and STM32PLUS_VERSION variables."
@@ -58,7 +58,7 @@ env.Replace(AS="arm-none-eabi-as")
 
 # create the C and C++ flags that are needed. We can't use the extra or pedantic errors on the ST library code.
 
-env.Replace(CCFLAGS=["-Wall","-Werror","-ffunction-sections","-fdata-sections","-fno-exceptions","-mthumb","-gdwarf-2","-pipe","-mcpu=cortex-m0","-DSTM32PLUS_F0_51","-DHSE_VALUE=8000000"])
+env.Replace(CCFLAGS=["-Wall","-Werror","-ffunction-sections","-fdata-sections","-fno-exceptions","-mthumb","-gdwarf-2","-pipe","-mcpu=cortex-m0","-DSTM32PLUS_F0_51","-DHSI_VALUE=8000000"])
 env.Replace(CXXFLAGS=["-Wextra","-pedantic-errors","-fno-rtti","-std=gnu++0x","-fno-threadsafe-statics"])
 env.Append(ASFLAGS="-mcpu=cortex-m0")
 env.Append(LINKFLAGS=["-Xlinker","--gc-sections","-mthumb","-g3","-gdwarf-2","-mcpu=cortex-m0"])
@@ -93,7 +93,7 @@ env.Append(CPPPATH="include")
 
 # set the library path
 
-env.Append(LIBS="stm32plus-"+mode+"-f051-8000000.a")
+env.Append(LIBS="stm32plus-"+mode+"-f051-8000000i.a")
 
 # collect the source files
 

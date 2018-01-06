@@ -497,7 +497,7 @@ namespace awreflow {
 
     Point np1(p1),np2(p2);
 
-    if(Abs(p2.X-p1.X)>Abs(p2.Y-p1.Y)) {
+    if(std::abs(p2.X-p1.X)>std::abs(p2.Y-p1.Y)) {
       np1.Y++;
       np2.Y++;
     }
